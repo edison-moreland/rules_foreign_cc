@@ -51,7 +51,6 @@ def _create_make_script(configureParameters):
 
     #print("flags are", flags)
     cc_toolchain = find_cpp_toolchain(ctx)
-    print("ld exec is ", cc_toolchain.ld_executable)
 
     data = ctx.attr.data + ctx.attr.build_data
 
@@ -62,17 +61,17 @@ def _create_make_script(configureParameters):
     ])
 
     make_commands = []
-    ## TODO change this to instead check if we are using msvc
-    if "win" in os_name(ctx):
-        # Prepend PATH environment variable with the path to the toolchain linker, which prevents MSYS using its linker (/usr/bin/link.exe) rather than the MSVC linker (both are named "link.exe")
-        linker_path = paths.dirname(cc_toolchain.ld_executable)
+    # ## TODO change this to instead check if we are using msvc
+    # if "win" in os_name(ctx):
+    #     # Prepend PATH environment variable with the path to the toolchain linker, which prevents MSYS using its linker (/usr/bin/link.exe) rather than the MSVC linker (both are named "link.exe")
+    #     linker_path = paths.dirname(cc_toolchain.ld_executable)
 
-        # Change prefix of linker path from Windows style to Unix style, required by MSYS. E.g. change "C:" to "/c"
-        if linker_path[0].isalpha() and linker_path[1] == ":":
-            linker_path = linker_path.replace(linker_path[0:2], "/" + linker_path[0].lower())
+    #     # Change prefix of linker path from Windows style to Unix style, required by MSYS. E.g. change "C:" to "/c"
+    #     if linker_path[0].isalpha() and linker_path[1] == ":":
+    #         linker_path = linker_path.replace(linker_path[0:2], "/" + linker_path[0].lower())
 
-        # MSYS requires pahts containing whitespace to be wrapped in quotation marks
-        make_commands.append("export PATH=\"" + linker_path + "\":$PATH")
+    #     # MSYS requires pahts containing whitespace to be wrapped in quotation marks
+    #     make_commands.append("export PATH=\"" + linker_path + "\":$PATH")
 
     prefix = "{} ".format(expand_locations(attrs.tool_prefix, data)) if attrs.tool_prefix else ""
     for target in ctx.attr.targets:

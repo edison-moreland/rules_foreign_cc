@@ -60,24 +60,24 @@ def built_tool_rule_impl(ctx, script_lines, out_dir, mnemonic):
 
     cc_toolchain = find_cpp_toolchain(ctx)
 
-    path_prepend_cmd = ""
-    if "win" in os_name(ctx):
-        # Prepend PATH environment variable with the path to the toolchain linker, which prevents MSYS using its linker (/usr/bin/link.exe) rather than the MSVC linker (both are named "link.exe")
-        linker_path = paths.dirname(cc_toolchain.ld_executable)
+    # path_prepend_cmd = ""
+    # if "win" in os_name(ctx):
+    #     # Prepend PATH environment variable with the path to the toolchain linker, which prevents MSYS using its linker (/usr/bin/link.exe) rather than the MSVC linker (both are named "link.exe")
+    #     linker_path = paths.dirname(cc_toolchain.ld_executable)
 
-        # Change prefix of linker path from Windows style to Unix style, required by MSYS. E.g. change "C:" to "/c"
-        if linker_path[0].isalpha() and linker_path[1] == ":":
-            linker_path = linker_path.replace(linker_path[0:2], "/" + linker_path[0].lower())
+    #     # Change prefix of linker path from Windows style to Unix style, required by MSYS. E.g. change "C:" to "/c"
+    #     if linker_path[0].isalpha() and linker_path[1] == ":":
+    #         linker_path = linker_path.replace(linker_path[0:2], "/" + linker_path[0].lower())
 
-        # MSYS requires pahts containing whitespace to be wrapped in quotation marks
-        path_prepend_cmd = "export PATH=\"" + linker_path + "\":$PATH"
+    #     # MSYS requires pahts containing whitespace to be wrapped in quotation marks
+    #     path_prepend_cmd = "export PATH=\"" + linker_path + "\":$PATH"
 
     script = env_prelude + [
         "##script_prelude##",
         "export EXT_BUILD_ROOT=##pwd##",
         "export INSTALLDIR=$$EXT_BUILD_ROOT$$/{}".format(out_dir.path),
         "export BUILD_TMPDIR=$$INSTALLDIR$$.build_tmpdir",
-        path_prepend_cmd,
+        #path_prepend_cmd,
         "##mkdirs## $$BUILD_TMPDIR$$",
         "##copy_dir_contents_to_dir## ./{} $$BUILD_TMPDIR$$".format(root),
         "cd $$BUILD_TMPDIR$$",
