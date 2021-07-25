@@ -1,0 +1,12 @@
+first build expat:
+~/cmake-3.21.0-windows-x86_64/bin/cmake -G "NMake Makefiles" -DEXPAT_SHARED_LIBS=OFF -DEXPAT_MSVC_STATIC_CRT=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/home/jheaf/expat-install ..
+
+copy expat source into apr-util/xml/expat/, so that apr-util/xml/expat/lib/expat.h exists
+copy built libexpatMT.lib to the apr-util folder
+have folder structure:
+    apr
+    apr-iconv
+    apr-util
+
+cd into apr-util then:
+nmake -F Makefile.win XML_PARSER="libexpatMT" PREFIX=..\apr-util-install ARCH="x64 Release" buildall
