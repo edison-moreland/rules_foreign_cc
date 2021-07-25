@@ -11,6 +11,14 @@ config_setting(
 )
 
 config_setting(
+    name = "msvc",
+    flag_values = {
+        "@bazel_tools//tools/cpp:compiler": "msvc-cl",
+    },
+    visibility = ["//visibility:public"],
+)
+
+config_setting(
     name = "macos",
     constraint_values = ["@platforms//os:macos"],
     visibility = ["//visibility:public"],
