@@ -1,0 +1,29 @@
+load("@rules_foreign_cc//foreign_cc:defs.bzl", "cmake")
+
+filegroup(
+    name = "all_srcs",
+    srcs = glob(["**"]),
+)
+
+alias(
+    name = "apr",
+    actual = select({
+        "@rules_foreign_cc_examples//:msvc": "apr_msvc",
+        # expat build currently unimplemented except for MSVC, for building apr-util
+        "//conditions:default": None,
+    }),
+    visibility = ["//visibility:public"],
+)
+
+cmake(
+    name = "expat",
+    cache_entries = {
+        "EXPAT_SHARED_LIBS": "OFF",
+        "EXPAT_MSVC_STATIC_CRT": "ON",
+        "CMAKE_BUILD_TYPE": "Release",
+    },
+    generate_args = ["-G\"NMake Makefiles\""],
+    lib_source = ":all_srcs",
+    out_static_libs = ["libexpatMT.lib"],
+    visibility = ["//visibility:public"],
+)
