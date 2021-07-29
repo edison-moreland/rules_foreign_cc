@@ -1,12 +1,34 @@
-load("@rules_foreign_cc//foreign_cc:defs.bzl", "configure_make")
+load("@rules_foreign_cc//foreign_cc:defs.bzl", "configure_make", "make_variant")
+
+LIB_NAME = "apr"
 
 filegroup(
     name = "all_srcs",
     srcs = glob(["**"]),
 )
 
-configure_make(
+alias(
     name = "apr",
+    actual = select({
+        "@rules_foreign_cc_examples//:msvc_compiler": "apr_msvc",
+        "//conditions:default": "apr_default",
+    }),
+    visibility = ["//visibility:public"],
+)
+
+make_variant(
+    name = "apr_msvc",
+    toolchain = "@rules_foreign_cc//toolchains:preinstalled_nmake_toolchain",
+    args = ["-F Makefile.win", "ARCH=\"x64 Release\"", "PREFIX=$INSTALLDIR"],
+    targets = ["buildall", "install"],
+    lib_source = ":all_srcs",
+    lib_name = LIB_NAME,
+    out_static_libs = ["apr-1.lib"],
+    visibility = ["//visibility:public"],
+)
+
+configure_make(
+    name = "apr_default",
     configure_in_place = True,
     configure_options = [
         "--disable-shared",
@@ -16,6 +38,7 @@ configure_make(
         "//conditions:default": {},
     }),
     lib_source = ":all_srcs",
+    lib_name = LIB_NAME,
     out_static_libs = ["libapr-1.a"],
     visibility = ["//visibility:public"],
 )
