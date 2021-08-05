@@ -1,4 +1,4 @@
-load("@rules_foreign_cc//foreign_cc:defs.bzl", "cmake")
+load("@rules_foreign_cc//foreign_cc:defs.bzl", "cmake", "configure_make")
 
 filegroup(
     name = "all_srcs",
@@ -10,7 +10,7 @@ alias(
     actual = select({
         "@rules_foreign_cc_examples//:msvc": "expat_msvc",
         # expat build currently unimplemented except for MSVC, for building apr-util
-        "//conditions:default": None,
+        "//conditions:default": "expat_default",
     }),
     visibility = ["//visibility:public"],
 )
@@ -37,5 +37,6 @@ configure_make(
         "--without-tests",
     ],
     lib_source = ":all_srcs",
+    lib_name = "expat",
     out_static_libs = ["libexpat.a"],
 )
