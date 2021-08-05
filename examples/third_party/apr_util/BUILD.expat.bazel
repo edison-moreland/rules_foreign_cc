@@ -6,9 +6,9 @@ filegroup(
 )
 
 alias(
-    name = "apr",
+    name = "expat",
     actual = select({
-        "@rules_foreign_cc_examples//:msvc": "apr_msvc",
+        "@rules_foreign_cc_examples//:msvc": "expat_msvc",
         # expat build currently unimplemented except for MSVC, for building apr-util
         "//conditions:default": None,
     }),
@@ -16,7 +16,7 @@ alias(
 )
 
 cmake(
-    name = "expat",
+    name = "expat_msvc",
     cache_entries = {
         "EXPAT_SHARED_LIBS": "OFF",
         "EXPAT_MSVC_STATIC_CRT": "ON",
@@ -24,6 +24,18 @@ cmake(
     },
     generate_args = ["-G\"NMake Makefiles\""],
     lib_source = ":all_srcs",
+    lib_name = "expat",
     out_static_libs = ["libexpatMT.lib"],
     visibility = ["//visibility:public"],
+)
+
+configure_make(
+    name = "expat_default",
+    configure_options = [
+        "--disable-shared",
+        "--without-examples",
+        "--without-tests",
+    ],
+    lib_source = ":all_srcs",
+    out_static_libs = ["libexpat.a"],
 )
