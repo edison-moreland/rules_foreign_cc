@@ -1,0 +1,16 @@
+load("@bazel_skylib//rules:build_test.bzl", "build_test")
+
+exports_files(
+    [
+        "BUILD.log4cxx.bazel",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+build_test(
+    name = "log4cxx_build_test",
+    targets = [
+        "@log4cxx//:log4cxx",
+    ],
+    visibility = ["//:__pkg__"],
+)
