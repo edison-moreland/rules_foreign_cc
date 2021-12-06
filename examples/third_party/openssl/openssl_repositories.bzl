@@ -37,16 +37,3 @@ def openssl_repositories():
             "https://github.com/bazelbuild/rules_perl/archive/2f4f36f454375e678e81e5ca465d4d497c5c02da.tar.gz",
         ],
     )
-
-    # rules_perl doesn't currently support Windows, so we need to bring along our own Perl.
-    # https://github.com/bazelbuild/rules_perl/issues/30
-    maybe(
-        http_archive,
-        name = "perl",
-        build_file = Label("//openssl:BUILD.perl.bazel"),
-        sha256 = "aeb973da474f14210d3e1a1f942dcf779e2ae7e71e4c535e6c53ebabe632cc98",
-        urls = [
-            "https://mirror.bazel.build/strawberryperl.com/download/5.32.1.1/strawberry-perl-5.32.1.1-64bit.zip",
-            "https://strawberryperl.com/download/5.32.1.1/strawberry-perl-5.32.1.1-64bit.zip",
-        ],
-    )

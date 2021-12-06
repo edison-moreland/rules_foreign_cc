@@ -1,0 +1,17 @@
+Loading: 
+Loading: 0 packages loaded
+Analyzing: 5 targets (0 packages loaded, 0 targets configured)
+INFO: Repository gnumake_src instantiated at:
+  C:/msys64/home/jheaf/git/rules_foreign_cc/examples/third_party/WORKSPACE.bazel:10:30: in <toplevel>
+  C:/msys64/home/jheaf/_bazel_jheaf/msxmb6go/external/rules_foreign_cc/foreign_cc/repositories.bzl:54:25: in rules_foreign_cc_dependencies
+  C:/msys64/home/jheaf/_bazel_jheaf/msxmb6go/external/rules_foreign_cc/toolchains/built_toolchains.bzl:21:20: in built_toolchains
+  C:/msys64/home/jheaf/_bazel_jheaf/msxmb6go/external/rules_foreign_cc/toolchains/built_toolchains.bzl:425:14: in _make_toolchain
+  C:/msys64/home/jheaf/_bazel_jheaf/msxmb6go/external/bazel_tools/tools/build_defs/repo/utils.bzl:201:18: in maybe
+Repository rule http_archive defined at:
+  C:/msys64/home/jheaf/_bazel_jheaf/msxmb6go/external/bazel_tools/tools/build_defs/repo/http.bzl:336:31: in <toplevel>
+ERROR: While resolving toolchains for target @rules_perl//:current_toolchain: no matching toolchains found for types @rules_perl//:toolchain_type
+ERROR: Analysis of target '@openssl//:openssl_default' failed; build aborted: no matching toolchains found for types @rules_perl//:toolchain_type
+INFO: Elapsed time: 0.804s
+INFO: 0 processes.
+FAILED: Build did NOT complete successfully (0 packages loaded, 3 targets configured)
+FAILED: Build did NOT complete successfully (0 packages loaded, 3 targets configured)
