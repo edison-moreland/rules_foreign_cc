@@ -1,3 +1,8 @@
+# load(
+#     "//toolchains/native_tools:tool_access.bzl",
+#     "get_cmake_data",
+# )
+
 # buildifier: disable=module-docstring
 ToolInfo = provider(
     doc = "Information about the native tool",
@@ -24,10 +29,12 @@ def _native_tool_toolchain_impl(ctx):
         path = ctx.expand_location(ctx.attr.path, targets = [ctx.attr.target])
     else:
         path = ctx.expand_location(ctx.attr.path)
-    return platform_common.ToolchainInfo(data = ToolInfo(
-        path = path,
-        target = ctx.attr.target,
-    ))
+    return platform_common.ToolchainInfo(
+        data = ToolInfo(
+            path = path,
+            target = ctx.attr.target,
+        ),
+    )
 
 native_tool_toolchain = rule(
     doc = (
@@ -59,3 +66,4 @@ native_tool_toolchain = rule(
     },
     incompatible_use_toolchain_transition = True,
 )
+

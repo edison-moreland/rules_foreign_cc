@@ -3,6 +3,8 @@ load("//foreign_cc/built_tools:cmake_build.bzl", "cmake_tool")
 load("//foreign_cc/built_tools:make_build.bzl", "make_tool")
 load("//foreign_cc/built_tools:ninja_build.bzl", "ninja_tool")
 load("//toolchains/native_tools:native_tools_toolchain.bzl", "native_tool_toolchain")
+load("//toolchains/native_tools:tool_access.bzl", "current_cmake_toolchain_rule")
+
 
 package(default_visibility = ["//visibility:public"])
 
@@ -32,6 +34,10 @@ toolchain_type(
 
 toolchain_type(
     name = "automake_toolchain",
+)
+
+current_cmake_toolchain_rule(
+    name = "current_cmake_toolchain"
 )
 
 toolchain(
