@@ -44,77 +44,98 @@ def get_ninja_data(ctx):
 def get_pkgconfig_data(ctx):
     return _access_and_expect_label_copied(str(Label("//toolchains:pkgconfig_toolchain")), ctx, "pkg-config")
 
-def _get_full_tool_path(tool_data):
-    '''
-        Returns the path to the tool relative to the bazel exec root
-    '''
-
-    # This could be made more efficient by changing the
-    # toolchain to provide the executable as a target
-    cmd_file = tool_data
-    for f in tool_data.target.files.to_list():
-        if f.path.endswith("/" + tool_data.path):
-            return f.path
-    return None
-
 def _access_and_expect_label_copied(toolchain_type_, ctx, tool_name):
     tool_data = access_tool(toolchain_type_, ctx, tool_name)
-    if tool_data.target:
-        cmd_file_path = _get_full_tool_path(tool_data)
-        if cmd_file_path == None:
-            cmd_file_path = tool_data.path
+    return struct(
+        deps = [] if tool_data.target == None else [tool_data.target],
+        # as the tool will be copied into tools directory
+        path = tool_data.path if tool_data.target == None else "$EXT_BUILD_ROOT/{}".format(tool_data.path),
+    )
 
-        return struct(
-            deps = [tool_data.target],
-            # as the tool will be copied into tools directory
-            path = "$EXT_BUILD_ROOT/{}".format(cmd_file_path),
-        )
-    else:
-        return struct(
-            deps = [],
-            path = tool_data.path,
-        )
-
-
-
-
-def _current_cmake_toolchain_impl(ctx):
-    toolchain = ctx.toolchains[str(Label("//toolchains:cmake_toolchain"))]
-
-    # TODO need to cater for preinstalled tools, ie where "target" is not set
-
-    #print(toolchain.data.target.files)
-
-    cmake_data = get_cmake_data(ctx)
-    tool_data = access_tool(str(Label("//toolchains:cmake_toolchain")), ctx, "cmake")
-    tool_data_path = _get_full_tool_path(tool_data)
-    #print((tool_data))
-
-    make_variables = platform_common.TemplateVariableInfo({
-        "CMAKE_EXE": tool_data_path,
-    })
-
-
+def current_native_tool_toolchain(ctx, toolchain):
     return [
         toolchain,
-        make_variables,
+        toolchain.make_variables,
         DefaultInfo(
             runfiles = ctx.runfiles(
                 files = toolchain.data.target.files.to_list(),
-                #files = cmake_data.deps,
             ),
         ),
     ]
 
-# This rule exists so that the current perl toolchain can be used in the `toolchains` attribute of
-# other rules, such as genrule. It allows exposing a perl_toolchain after toolchain resolution has
+
+# These rules exist so that the current cmake/make/etc toolchain can be used in the `toolchains` attribute of
+# other rules, such as genrule. It allows exposing a toolchain after toolchain resolution has
 # happened, to a rule which expects a concrete implementation of a toolchain, rather than a
 # toochain_type which could be resolved to that toolchain.
 #
 # See https://github.com/bazelbuild/bazel/issues/14009#issuecomment-921960766
+def _current_autoconf_toolchain_impl(ctx):
+    return current_native_tool_toolchain(ctx, ctx.toolchains[str(Label("//toolchains:autoconf_toolchain"))])
+
+current_autoconf_toolchain_rule = rule(
+    implementation = _current_autoconf_toolchain_impl,
+    toolchains = [
+        str(Label("//toolchains:autoconf_toolchain")),
+    ],
+)
+
+def _current_automake_toolchain_impl(ctx):
+    return current_native_tool_toolchain(ctx, ctx.toolchains[str(Label("//toolchains:automake_toolchain"))])
+
+current_automake_toolchain_rule = rule(
+    implementation = _current_automake_toolchain_impl,
+    toolchains = [
+        str(Label("//toolchains:automake_toolchain")),
+    ],
+)
+
+def _current_cmake_toolchain_impl(ctx):
+    return current_native_tool_toolchain(ctx, ctx.toolchains[str(Label("//toolchains:cmake_toolchain"))])
+
 current_cmake_toolchain_rule = rule(
     implementation = _current_cmake_toolchain_impl,
     toolchains = [
         str(Label("//toolchains:cmake_toolchain")),
+    ],
+)
+
+def _current_m4_toolchain_impl(ctx):
+    return current_native_tool_toolchain(ctx, ctx.toolchains[str(Label("//toolchains:m4_toolchain"))])
+
+current_m4_toolchain_rule = rule(
+    implementation = _current_m4_toolchain_impl,
+    toolchains = [
+        str(Label("//toolchains:m4_toolchain")),
+    ],
+)
+
+def _current_make_toolchain_impl(ctx):
+    return current_native_tool_toolchain(ctx, ctx.toolchains[str(Label("//toolchains:make_toolchain"))])
+
+current_make_toolchain_rule = rule(
+    implementation = _current_make_toolchain_impl,
+    toolchains = [
+        str(Label("//toolchains:make_toolchain")),
+    ],
+)
+
+def _current_ninja_toolchain_impl(ctx):
+    return current_native_tool_toolchain(ctx, ctx.toolchains[str(Label("//toolchains:ninja_toolchain"))])
+
+current_ninja_toolchain_rule = rule(
+    implementation = _current_ninja_toolchain_impl,
+    toolchains = [
+        str(Label("//toolchains:ninja_toolchain")),
+    ],
+)
+
+def _current_pkgconfig_toolchain_impl(ctx):
+    return current_native_tool_toolchain(ctx, ctx.toolchains[str(Label("//toolchains:pkgconfig_toolchain"))])
+
+current_pkgconfig_toolchain_rule = rule(
+    implementation = _current_pkgconfig_toolchain_impl,
+    toolchains = [
+        str(Label("//toolchains:pkgconfig_toolchain")),
     ],
 )

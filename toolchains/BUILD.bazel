@@ -3,7 +3,14 @@ load("//foreign_cc/built_tools:cmake_build.bzl", "cmake_tool")
 load("//foreign_cc/built_tools:make_build.bzl", "make_tool")
 load("//foreign_cc/built_tools:ninja_build.bzl", "ninja_tool")
 load("//toolchains/native_tools:native_tools_toolchain.bzl", "native_tool_toolchain")
-load("//toolchains/native_tools:tool_access.bzl", "current_cmake_toolchain_rule")
+load("//toolchains/native_tools:tool_access.bzl",
+    "current_cmake_toolchain_rule",
+    "current_ninja_toolchain_rule",
+    "current_make_toolchain_rule",
+    "current_pkgconfig_toolchain_rule",
+    "current_autoconf_toolchain_rule",
+    "current_automake_toolchain_rule"
+)
 
 
 package(default_visibility = ["//visibility:public"])
@@ -38,6 +45,30 @@ toolchain_type(
 
 current_cmake_toolchain_rule(
     name = "current_cmake_toolchain"
+)
+
+current_ninja_toolchain_rule(
+    name = "current_ninja_toolchain"
+)
+
+current_make_toolchain_rule(
+    name = "current_make_toolchain"
+)
+
+current_pkgconfig_toolchain_rule(
+    name = "current_pkgconfig_toolchain"
+)
+
+current_cmake_toolchain_rule(
+    name = "current_m4_toolchain"
+)
+
+current_autoconf_toolchain_rule(
+    name = "current_autoconf_toolchain"
+)
+
+current_automake_toolchain_rule(
+    name = "current_automake_toolchain"
 )
 
 toolchain(
