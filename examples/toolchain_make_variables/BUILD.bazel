@@ -6,10 +6,10 @@ load("@bazel_skylib//rules:build_test.bzl", "build_test")
     (
         genrule(
             name = "%s_toolchain_make_var" % tool,
-            cmd = "ls $(%s) > $@" % ("PKG-CONFIG" if tool == "pkgconfig" else tool.upper()),
+            cmd = "ls -l bazel-out/host/bin/external/rules_foreign_cc/toolchains/make/bin/make && ls $(%s) > $@" % ("PKG-CONFIG" if tool == "pkgconfig" else tool.upper()),
             outs = ["%s_path.txt" % tool],
             toolchains = ["@rules_foreign_cc//toolchains:current_%s_toolchain" % tool],
-            tools = ["@rules_foreign_cc//toolchains:make_tool"]
+            #tools = ["@rules_foreign_cc//toolchains:make_tool"]
         ),
         build_test(
             name = "%s_build_test" % tool,
@@ -18,7 +18,7 @@ load("@bazel_skylib//rules:build_test.bzl", "build_test")
             ],
             visibility = ["//:__pkg__"],
         )
-    ) for tool in ["cmake", "ninja", "make"]
+    ) for tool in ["make"]
 ]
 
 #    ) for tool in ["cmake", "make", "ninja", "pkgconfig", "m4", "autoconf", "automake"]
