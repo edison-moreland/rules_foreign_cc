@@ -53,14 +53,18 @@ def _access_and_expect_label_copied(toolchain_type_, ctx, tool_name):
     )
 
 def current_native_tool_toolchain(ctx, toolchain):
-    return [
-        toolchain,
-        toolchain.make_variables,
-        DefaultInfo(
+    default_info = DefaultInfo()
+    if toolchain.data.target:
+        default_info = DefaultInfo(
             runfiles = ctx.runfiles(
                 files = toolchain.data.target.files.to_list(),
             ),
-        ),
+        )
+
+    return [
+        toolchain,
+        toolchain.make_variables,
+        default_info
     ]
 
 

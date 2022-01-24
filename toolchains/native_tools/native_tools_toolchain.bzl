@@ -36,6 +36,8 @@ def _native_tool_toolchain_impl(ctx):
     tool_exe = paths.split_extension(tool_exe)[0]
     tool_exe = tool_exe.upper()
 
+    print("var is ", tool_exe, " and path is ", path)
+
     return platform_common.ToolchainInfo(
         data = ToolInfo(
             path = path,

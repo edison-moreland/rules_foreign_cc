@@ -8,6 +8,7 @@ load("//toolchains/native_tools:tool_access.bzl",
     "current_ninja_toolchain_rule",
     "current_make_toolchain_rule",
     "current_pkgconfig_toolchain_rule",
+    "current_m4_toolchain_rule",
     "current_autoconf_toolchain_rule",
     "current_automake_toolchain_rule"
 )
@@ -59,7 +60,7 @@ current_pkgconfig_toolchain_rule(
     name = "current_pkgconfig_toolchain"
 )
 
-current_cmake_toolchain_rule(
+current_m4_toolchain_rule(
     name = "current_m4_toolchain"
 )
 
