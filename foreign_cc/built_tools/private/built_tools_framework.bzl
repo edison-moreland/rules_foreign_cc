@@ -84,10 +84,13 @@ def built_tool_rule_impl(ctx, script_lines, out_dir, mnemonic):
 
     wrapped_outputs = wrap_outputs(ctx, lib_name, mnemonic, script_text)
 
+    py_toolchain = ctx.toolchains["@rules_python//python:toolchain_type"]
+
     tools = depset(
-        [wrapped_outputs.wrapper_script_file, wrapped_outputs.script_file],
-        transitive = [cc_toolchain.all_files],
+        [wrapped_outputs.wrapper_script_file, wrapped_outputs.script_file,  py_toolchain.py3_runtime.interpreter],
+        transitive = [cc_toolchain.all_files, py_toolchain.py3_runtime.files],
     )
+
 
     # The use of `run_shell` here is intended to ensure bash is correctly setup on windows
     # environments. This should not be replaced with `run` until a cross platform implementation
@@ -102,8 +105,10 @@ def built_tool_rule_impl(ctx, script_lines, out_dir, mnemonic):
         execution_requirements = {"block-network": ""},
     )
 
+    # todo - not sure if this stuff is necessary
+
     return [
-        DefaultInfo(files = depset([out_dir]), runfiles = ctx.runfiles(files = [out_dir])),
+        DefaultInfo(files = depset(direct = [out_dir], transitive = [py_toolchain.py3_runtime.files]), runfiles = ctx.runfiles(files = [out_dir], transitive_files = py_toolchain.py3_runtime.files)),
         OutputGroupInfo(
             log_file = depset([wrapped_outputs.log_file]),
             script_file = depset([wrapped_outputs.script_file]),

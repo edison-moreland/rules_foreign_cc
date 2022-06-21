@@ -9,10 +9,18 @@ load(
 )
 load("//foreign_cc/private/framework:platform.bzl", "os_name")
 
+load(
+    "//foreign_cc/private:cc_toolchain_util.bzl",
+    "absolutize_path_in_str",
+)
+
 def _ninja_tool_impl(ctx):
+    py_toolchain = ctx.toolchains["@rules_python//python:toolchain_type"]
+
+    absolute_py_interpreter_path = _absolutize(ctx.workspace_name, py_toolchain.py3_runtime.interpreter.path, True)
+
     script = [
-        # TODO: Drop custom python3 usage https://github.com/ninja-build/ninja/pull/2118
-        "python3 ./configure.py --bootstrap",
+        "{} ./configure.py --bootstrap".format(absolute_py_interpreter_path),
         "mkdir $$INSTALLDIR$$/bin",
         "cp -p ./ninja{} $$INSTALLDIR$$/bin/".format(
             ".exe" if "win" in os_name(ctx) else "",
@@ -36,5 +44,10 @@ ninja_tool = rule(
     toolchains = [
         "@rules_foreign_cc//foreign_cc/private/framework:shell_toolchain",
         "@bazel_tools//tools/cpp:toolchain_type",
+        "@rules_python//python:toolchain_type",
     ],
 )
+
+# todo commonise
+def _absolutize(workspace_name, text, force = False):
+    return absolutize_path_in_str(workspace_name, "$$EXT_BUILD_ROOT$$/", text, force)
