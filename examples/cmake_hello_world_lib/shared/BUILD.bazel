@@ -16,12 +16,28 @@ cmake(
     # Apparently, it needs to be set for shared libraries on Mac OS
     cache_entries = {
         "CMAKE_MACOSX_RPATH": "True",
+        "CMAKE_SHARED_LINKER_FLAGS": "",
+        "CMAKE_EXE_LINKER_FLAGS": "",
+        "CMAKE_CXX_FLAGS_INIT": "",
+        "CMAKE_C_FLAGS_INIT": "",
     },
+    generate_args = select({
+        # TODO: The use of Visual Studio generator targets are broken. These should
+        # be re-enabled pending a resolution to
+        # https://github.com/bazelbuild/continuous-integration/issues/1204
+        "@platforms//os:windows": ["-GNinja"],
+        "//conditions:default": [],
+    }),
+    generate_crosstool_file = False,
     lib_source = ":srcs",
     out_shared_libs = select({
         "//:macos": ["libhello.dylib"],
         "//:windows": ["libhello.dll"],
         "//conditions:default": ["libhello.so"],
+    }),
+    out_interface_libs = select({
+        "//:windows": ["libhello.lib"],
+        "//conditions:default": [""],
     }),
     # TODO: The `.dll` is installed in the `bin` directory. To account for this, windows
     # moves it to the `lib` directory. The rules should account for this case.
@@ -29,10 +45,19 @@ cmake(
         "//:windows": "cp -p $$INSTALLDIR$$/bin/libhello.dll $$INSTALLDIR$$/lib",
         "//conditions:default": None,
     }),
+    tool_prefix = "unset CC CXX CFLAGS CXXFLAGS ASMFLAGS &&",
 )
 
-cc_test(
+cc_import(
+    name = "libhello_import",
+    hdrs = ["hello.h"],
+    interface_library = "libhello.lib",
+    shared_library = "libhello.dll",
+)
+
+# TODO - it seems that the cmake() rule must not set the providers in the right way for cc_binary to know about the DLL, but cc_import does it successfully
+cc_binary(
     name = "test_libhello",
     srcs = ["hello_client.c"],
-    deps = [":libhello"],
+    deps = [":libhello_import"],
 )
