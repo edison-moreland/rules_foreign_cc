@@ -48,16 +48,9 @@ cmake(
     tool_prefix = "unset CC CXX CFLAGS CXXFLAGS ASMFLAGS &&",
 )
 
-cc_import(
-    name = "libhello_import",
-    hdrs = ["hello.h"],
-    interface_library = "libhello.lib",
-    shared_library = "libhello.dll",
-)
-
 # TODO - it seems that the cmake() rule must not set the providers in the right way for cc_binary to know about the DLL, but cc_import does it successfully
 cc_binary(
     name = "test_libhello",
     srcs = ["hello_client.c"],
-    deps = [":libhello_import"],
+    deps = ["//cmake_hello_world_lib/static:libhello_import"],
 )
