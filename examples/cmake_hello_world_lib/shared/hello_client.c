@@ -1,4 +1,4 @@
-#include "cmake_hello_world_lib/static/hello.h"
+#include "hello.h"
 
 int main(int argc, char* argv[])
 {

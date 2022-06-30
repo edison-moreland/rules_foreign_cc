@@ -52,5 +52,5 @@ cmake(
 cc_binary(
     name = "test_libhello",
     srcs = ["hello_client.c"],
-    deps = ["//cmake_hello_world_lib/static:libhello_import"],
+    deps = ["//cmake_hello_world_lib/static:libhello"],
 )
