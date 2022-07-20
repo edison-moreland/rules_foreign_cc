@@ -35,4 +35,4 @@ def python_repositories():
         sha256 = "cd6730ed53a002c56ce4e2f396ba3b3be262fd7cb68339f0377a45e8227fe332",
     )
 
-    native.register_toolchains("@rules_foreign_cc_examples_third_party//python:python_toolchain")
+    # native.register_toolchains("@rules_foreign_cc_examples_third_party//python:python_toolchain")
