@@ -1,0 +1,24 @@
+load("@rules_foreign_cc//foreign_cc:defs.bzl", "meson")
+
+package(default_visibility = ["//visibility:public"])
+
+filegroup(
+    name = "all_srcs",
+    srcs = glob(["**"]),
+)
+
+meson(
+    name = "libdrm",
+    lib_source = ":all_srcs",
+    deps = ["@libpciaccess"],
+    out_shared_libs = [
+        "libdrm_amdgpu.so.1",
+        "libdrm_intel.so.1",
+        "libdrm_nouveau.so.2",
+        "libdrm_radeon.so.1",
+    ],
+    out_lib_dir = "lib/x86_64-linux-gnu",
+)
+
+
+# TODO instead of libdrm (which is probably only linux), look at cross platform project at https://mesonbuild.com/Users.html
