@@ -1,0 +1,7 @@
+exports_files(["meson.py"])
+
+filegroup(
+    name = "runtime",
+    srcs = glob(["mesonbuild/**"]),
+)
+

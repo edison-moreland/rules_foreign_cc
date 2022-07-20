@@ -89,3 +89,14 @@ def rules_foreign_cc_dependencies(
         strip_prefix = "rules_python-0.9.0",
         url = "https://github.com/bazelbuild/rules_python/archive/refs/tags/0.9.0.tar.gz",
     )
+
+    maybe(
+        http_archive,
+        name = "meson",
+        build_file = Label("//foreign_cc/private:BUILD.meson"),
+        sha256 = "3b51d451744c2bc71838524ec8d96cd4f8c4793d5b8d5d0d0a9c8a4f7c94cd6f",
+        strip_prefix = "meson-0.63.0",
+        url = "https://github.com/mesonbuild/meson/releases/download/0.63.0/meson-0.63.0.tar.gz",
+    )
+
+    # TODO have versioned meson, like versioned other tools above    
