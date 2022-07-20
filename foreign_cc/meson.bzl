@@ -1,8 +1,176 @@
-load(":ninja.bzl", "ninja")
+"""A rule for building projects using the [Meson](https://mesonbuild.com/) build system"""
+
+load(
+    "//foreign_cc/private:detect_root.bzl",
+    "detect_root",
+)
+load(
+    "//foreign_cc/private:framework.bzl",
+    "CC_EXTERNAL_RULE_ATTRIBUTES",
+    "CC_EXTERNAL_RULE_FRAGMENTS",
+    "cc_external_rule_impl",
+    "create_attrs",
+    "expand_locations_and_make_variables",
+)
+load("//toolchains/native_tools:tool_access.bzl", "get_ninja_data")
+load("//foreign_cc/private:make_script.bzl", "pkgconfig_script")
 load("@rules_python//python:defs.bzl", "py_binary")
 
-# Will the bazel skydocs pick these up, as it isnt a rule, only a macro?
-def meson(name, requirements=None, targets=["", "install"], **kwargs):
+def _meson_priv_impl(ctx):
+    """The implementation of the `meson` rule
+
+    Args:
+        ctx (ctx): The rule's context object
+
+    Returns:
+        list: A list of providers. See `cc_external_rule_impl`
+    """
+
+    meson_path = "$EXT_BUILD_ROOT/" + ctx.executable.meson_bin.path
+
+    # TODO - like with cmake (i assume), only add ninja to tool deps if ninja generator is used
+    ninja_data = get_ninja_data(ctx)
+
+    tools_deps = ctx.attr.tools_deps + [ctx.attr.meson_bin]
+    tools_deps += ninja_data.deps
+
+    attrs = create_attrs(
+        ctx.attr,
+        configure_name = "Meson",
+        create_configure_script = _create_meson_script,
+        tools_deps = tools_deps,
+        meson_path = meson_path,
+    )
+    return cc_external_rule_impl(ctx, attrs)
+
+def _create_meson_script(configureParameters):
+    """Creates the bash commands for invoking commands to build ninja projects
+
+    Args:
+        configureParameters (struct): See `ConfigureParameters`
+
+    Returns:
+        str: A string representing a section of a bash script
+    """
+    ctx = configureParameters.ctx
+    attrs = configureParameters.attrs
+
+    script = pkgconfig_script(configureParameters.inputs.ext_build_dirs)
+
+    root = detect_root(ctx.attr.lib_source)
+
+    data = ctx.attr.data + ctx.attr.build_data
+
+    # Generate a list of arguments for meson
+    generate_args = " ".join([
+        ctx.expand_location(arg, data)
+        for arg in ctx.attr.generate_args
+    ])
+
+    prefix = "{} ".format(expand_locations_and_make_variables(ctx, attrs.tool_prefix, "tool_prefix", data)) if attrs.tool_prefix else ""
+
+    ## TODO - within the builddir, so meson <path to source dir>. need to allow different generators, default should be ninja. only add ninja to action if ninja is used
+    # meson is using ninja from /usr/bin, make sure ninja is on the path, like done in cmake.bzl or cmake_script.bzl
+
+    script.append("{prefix}{meson} --prefix={install_dir} {args} {source_dir}".format(
+        prefix = prefix,
+        meson = attrs.meson_path,
+        install_dir="$$INSTALLDIR$$",
+        args = generate_args,
+        source_dir = "$$EXT_BUILD_ROOT$$/" + root,
+    ))
+
+    build_args = " ".join([
+        ctx.expand_location(arg, data)
+        for arg in ctx.attr.build_args
+    ])
+    script.append("{prefix}{meson} compile {args}".format(
+        prefix = prefix,
+        meson = attrs.meson_path,
+        args = build_args,
+    ))
+
+    if ctx.attr.install:
+        install_args = " ".join([
+            ctx.expand_location(arg, data)
+            for arg in ctx.attr.install_args
+        ])
+        script.append("{prefix}{meson} install {args}".format(
+            prefix = prefix,
+            meson = attrs.meson_path,
+            args = install_args,
+        ))
+
+    return script
+
+def _attrs():
+    """Modifies the common set of attributes used by rules_foreign_cc and sets Meson specific attrs
+
+    Returns:
+        dict: Attributes of the `meson` rule
+    """
+    attrs = dict(CC_EXTERNAL_RULE_ATTRIBUTES)
+
+    attrs.update({
+        "build_args": attr.string_list(
+            doc = "Arguments for the CMake build command",
+            mandatory = False,
+        ),
+        "generate_args": attr.string_list(
+            doc = (
+                "Arguments for CMake's generate command. Arguments should be passed as key/value pairs. eg: " +
+                "`[\"-G Ninja\", \"--debug-output\", \"-DFOO=bar\"]`. Note that unless a generator (`-G`) argument " +
+                "is provided, the default generators are [Unix Makefiles](https://cmake.org/cmake/help/latest/generator/Unix%20Makefiles.html) " +
+                "for Linux and MacOS and [Ninja](https://cmake.org/cmake/help/latest/generator/Ninja.html) for " +
+                "Windows."
+            ),
+            mandatory = False,
+            default = [],
+        ),
+        "install": attr.bool(
+            doc = "If True, the `meson install` comand will be performed after a build",
+            default = True,
+        ),
+        "install_args": attr.string_list(
+            doc = "Arguments for the meson install command",
+            mandatory = False,
+        ),
+       "meson_bin": attr.label(
+            doc = "Arguments for the meson install command",
+            cfg = "exec",
+            executable = True,
+            mandatory = True,
+        ),
+        # "install_prefix": attr.string(
+        #     doc = (
+        #         "Install prefix, i.e. relative path to where to install the result of the build. " +
+        #         "Passed as an arg to \"meson\" as --prefix=<install_prefix>."
+        #     ),
+        #     mandatory = False,
+        #     default = "$$INSTALLDIR$$",
+        # ),
+    })
+    return attrs
+
+meson_priv = rule(
+    doc = (
+        "Rule for building external libraries with [Ninja](https://ninja-build.org/)."
+    ),
+    attrs = _attrs(),
+    fragments = CC_EXTERNAL_RULE_FRAGMENTS,
+    output_to_genfiles = True,
+    implementation = _meson_priv_impl,
+    toolchains = [
+        "@rules_foreign_cc//toolchains:ninja_toolchain",
+        "@rules_foreign_cc//foreign_cc/private/framework:shell_toolchain",
+        "@bazel_tools//tools/cpp:toolchain_type",
+    ],
+    # TODO: Remove once https://github.com/bazelbuild/bazel/issues/11584 is closed and the min supported
+    # version is updated to a release of Bazel containing the new default for this setting.
+    incompatible_use_toolchain_transition = True,
+)
+
+def meson(name, requirements=None, **kwargs):
     tags = kwargs.pop("tags", [])
 
     py_binary(
@@ -17,17 +185,10 @@ def meson(name, requirements=None, targets=["", "install"], **kwargs):
         main = "@meson//:meson.py",
     )
 
-    ninja(
+    # perhaps rename the rule to _meson
+    meson_priv(
         name = name,
-        build_data = [
-            ":meson_for_{}".format(name),
-        ] + kwargs.pop("build_data", []),
-        directory = "builddir",
-        tool_prefix = kwargs.pop("tool_prefix", "true") + " && OLD_PWD=$$PWD && cd $$EXT_BUILD_ROOT && " + "MESON_FILES=($(locations :meson_for_{}))".format(name) + " && MESON_PATH=$$EXT_BUILD_ROOT/$${MESON_FILES[0]} && cd $$OLD_PWD && $$MESON_PATH --prefix=$$INSTALLDIR builddir &&",
-        targets = targets,
+        meson_bin = ":meson_for_{}".format(name),
         **kwargs
     )
 
-
-
-# have the py_binary src be @meson//:meson.py, and the "data" attr of the py_binary be all the files in the @meson//:mesonbuild dir
