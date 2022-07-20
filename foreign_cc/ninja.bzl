@@ -13,6 +13,7 @@ load(
     "expand_locations_and_make_variables",
 )
 load("//toolchains/native_tools:tool_access.bzl", "get_ninja_data")
+load("//foreign_cc/private:make_script.bzl", "pkgconfig_script")
 
 def _ninja_impl(ctx):
     """The implementation of the `ninja` rule
@@ -48,7 +49,7 @@ def _create_ninja_script(configureParameters):
     ctx = configureParameters.ctx
     attrs = configureParameters.attrs
 
-    script = []
+    script = pkgconfig_script(configureParameters.inputs.ext_build_dirs)
 
     root = detect_root(ctx.attr.lib_source)
     script.append("##symlink_contents_to_dir## $$EXT_BUILD_ROOT$$/{} $$BUILD_TMPDIR$$".format(root))
