@@ -407,7 +407,7 @@ def cc_external_rule_impl(ctx, attrs):
     data_dependencies = ctx.attr.data + ctx.attr.build_data + ctx.attr.toolchains
 
     # Also add legacy dependencies while they're still available
-    data_dependencies += ctx.attr.tools_deps + ctx.attr.additional_tools
+    data_dependencies += attrs.tools_deps + ctx.attr.tools_deps + ctx.attr.additional_tools
 
     env_prelude = get_env_prelude(ctx, lib_name, data_dependencies, target_root)
 
@@ -470,6 +470,7 @@ def cc_external_rule_impl(ctx, attrs):
     # is found that guarantees bash exists or appropriately errors out.
 
     tool_runfiles = []
+    print("data deps are", data_dependencies)
     for data in data_dependencies:
         tool_runfiles += data[DefaultInfo].default_runfiles.files.to_list()
 
