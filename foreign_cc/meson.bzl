@@ -31,6 +31,9 @@ def _meson_priv_impl(ctx):
     # TODO - like with cmake (i assume), only add ninja to tool deps if ninja generator is used
     ninja_data = get_ninja_data(ctx)
 
+    # TODO add cmake to the tool_deps, as meson delegates to cmake
+    # TODO add pkg-config to tool_deps - will need to build from source - is this already done in the rules_foreign_Cc examples?
+
     tools_deps = ctx.attr.tools_deps + [ctx.attr.meson_bin]
     tools_deps += ninja_data.deps
 
