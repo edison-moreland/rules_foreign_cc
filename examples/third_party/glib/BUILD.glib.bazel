@@ -1,0 +1,22 @@
+load("@rules_foreign_cc//foreign_cc:defs.bzl", "meson")
+
+package(default_visibility = ["//visibility:public"])
+
+filegroup(
+    name = "all_srcs",
+    srcs = glob(["**"]),
+)
+
+meson(
+    name = "glib",
+    lib_source = ":all_srcs",
+    out_shared_libs = [
+    "libgio-2.0.so.0",
+    "libglib-2.0.so.0",
+    "libgmodule-2.0.so.0",
+    "libgobject-2.0.so.0",
+    "libgthread-2.0.so.0",
+    ],
+    out_lib_dir = "lib/x86_64-linux-gnu",
+)
+
