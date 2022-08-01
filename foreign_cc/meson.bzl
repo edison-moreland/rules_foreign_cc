@@ -40,6 +40,7 @@ def _meson_priv_impl(ctx):
         create_configure_script = _create_meson_script,
         tools_deps = tools_deps,
         meson_path = meson_path,
+        ninja_path = ninja_data.path
     )
     return cc_external_rule_impl(ctx, attrs)
 
@@ -56,6 +57,7 @@ def _create_meson_script(configureParameters):
     attrs = configureParameters.attrs
 
     script = pkgconfig_script(configureParameters.inputs.ext_build_dirs)
+    script.append("##export_var## NINJA {}".format(attrs.ninja_path))
 
     root = detect_root(ctx.attr.lib_source)
 
