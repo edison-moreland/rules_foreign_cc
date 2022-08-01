@@ -21,4 +21,5 @@ cmake(
         "@platforms//os:windows": ["zlibstatic.lib"],
         "//conditions:default": ["libz.a"],
     }),
+    tool_prefix = "echo $$PROCESSOR_ARCHITECTURE &&"
 )
