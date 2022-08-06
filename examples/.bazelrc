@@ -1,3 +1,11 @@
+build --action_env=PROCESSOR_ARCHITECTURE
+
+# alternatively - HOMEPATH and HOMEDRIVE need to be set
+build --action_env=USERPROFILE
+
+
+# todo - get this working as i use it in my bazel-example repo
+#build --nobuild_python_zip
 
 # Required for Windows
 build --enable_runfiles

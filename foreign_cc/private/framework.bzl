@@ -335,6 +335,13 @@ def get_env_prelude(ctx, lib_name, data_dependencies, target_root):
         linker_path = paths.dirname(cc_toolchain.ld_executable)
         env.update({"PATH": _normalize_path(linker_path) + ":" + env.get("PATH")})
 
+    # TODO - say in commit message i had to move this as didnt take effect if user specified PATH
+    cc_toolchain = find_cpp_toolchain(ctx)
+    if cc_toolchain.compiler == "msvc-cl":
+        # Prepend PATH environment variable with the path to the toolchain linker, which prevents MSYS using its linker (/usr/bin/link.exe) rather than the MSVC linker (both are named "link.exe")
+        linker_path = paths.dirname(cc_toolchain.ld_executable)
+        env.update({"PATH": _normalize_path(linker_path) + ":" + env.get("PATH")})
+
     env_snippet.extend(["export {}=\"{}\"".format(key, escape_dquote_bash(val)) for key, val in env.items()])
 
     return env_snippet
@@ -666,6 +673,7 @@ def _correct_path_variable(env):
     if not value:
         return env
     value = _normalize_path(env.get("PATH", ""))
+    # TODO in commit message say i had to flip this other wise gcc link.exe was erroneously used instead of link.exe. actually this shouldnt be necessary, see line 315
     env["PATH"] = "$PATH:" + value
     return env
 
