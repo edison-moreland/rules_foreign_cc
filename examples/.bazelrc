@@ -1,1 +1,11 @@
 startup --output_user_root=C:/b
+build --action_env=PROCESSOR_ARCHITECTURE
+
+# alternatively - HOMEPATH and HOMEDRIVE need to be set
+build --action_env=USERPROFILE
+#build --override_repository=meson=C:\\msys64\\home\\jheaffey\\git\\meson
+#build --override_repository=glib=C:\\msys64\\home\\jheaffey\\git\\rules_foreign_cc\\examples\\glib-2.73.2
+
+
+# todo - get this working as i use it in my bazel-example repo
+#build --nobuild_python_zip
