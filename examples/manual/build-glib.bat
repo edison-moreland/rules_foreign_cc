@@ -32,10 +32,14 @@ cd gettext-0.21
 @REM  see build-gettext.sh
 
 set PKG_CONFIG_PATH=%cd%\pcre2-10.40\pcre2-install\lib\pkgconfig;%cd%\zlib-1.2.12\zlib-install\share\pkgconfig;%cd%\libffi-meson-3.2.9999.3\libffi-install/lib\pkgconfig
-set PATH=%cd%\bin;%PATH%
-set INCLUDE=%INCLUDE%;%cd%\proxy-libintl-0.4\proxy-libintl-install\include
-set LIB=%LIB%;%cd%\proxy-libintl-0.4\proxy-libintl-install\lib
+@REM note that pkg-config and gettext binaries were fetched from https://stackoverflow.com/a/22363820
+@REM set PATH=%cd%\bin;%PATH%
+set PATH=%cd%\bin;%cd%\gettext-runtime\bin;%PATH%
+set INCLUDE=%INCLUDE%;%cd%\gettext\include
+set LIB=%LIB%;%cd%\gettext\lib
+
+@REM got 64 bit gettext from https://download.gnome.org/binaries/win64/dependencies/gettext-runtime-dev_0.18.1.1-2_win64.zip or http://ftp.acc.umu.se/pub/gnome/binaries/win64/dependencies/gettext-runtime-dev_0.18.1.1-2_win64.zip
 cd glib-2.73.2
-C:\Users\jheaffey\AppData\Local\Programs\Python\Python310\python.exe ..\meson-0.63.0/meson.py --prefix=%cd%\glib-install builddir
+C:\Users\jheaffey\AppData\Local\Programs\Python\Python310\python.exe ..\meson-0.63.0/meson.py --prefix=%cd%\glib-install -Dtests=false builddir
 C:\Users\jheaffey\AppData\Local\Programs\Python\Python310\python.exe ..\meson-0.63.0/meson.py compile -C builddir
 C:\Users\jheaffey\AppData\Local\Programs\Python\Python310\python.exe ..\meson-0.63.0/meson.py install -C builddir
