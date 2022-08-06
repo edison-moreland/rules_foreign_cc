@@ -8,10 +8,9 @@ def pcre_repositories():
         http_archive,
         name = "pcre",
         build_file = Label("//pcre:BUILD.pcre.bazel"),
-        strip_prefix = "pcre-8.45",
-        sha256 = "4e6ce03e0336e8b4a3d6c2b70b1c5e18590a5673a98186da90d4f33c23defc09",
+        strip_prefix = "pcre2-10.40",
+        sha256 = "ded42661cab30ada2e72ebff9e725e745b4b16ce831993635136f2ef86177724",
         urls = [
-            "https://mirror.bazel.build/downloads.sourceforge.net/project/pcre/pcre/8.45/pcre-8.45.tar.gz",
-            "https://downloads.sourceforge.net/project/pcre/pcre/8.45/pcre-8.45.tar.gz",
+            "https://github.com/PhilipHazel/pcre2/releases/download/pcre2-10.40/pcre2-10.40.tar.gz",
         ],
     )
