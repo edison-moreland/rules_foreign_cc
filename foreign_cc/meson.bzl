@@ -32,7 +32,7 @@ def _meson_priv_impl(ctx):
     ninja_data = get_ninja_data(ctx)
 
     # TODO add cmake to the tool_deps, as meson delegates to cmake
-    # TODO add pkg-config to tool_deps - will need to build from source - is this already done in the rules_foreign_Cc examples?
+    # TODO add pkg-config to tool_deps, should first make built or prebuilt pkg-config toolchain (can download prebuilt artefacts from https://stackoverflow.com/a/1711338 or strawberry perl). If build from source it can be cross-platform
 
     tools_deps = ctx.attr.tools_deps + [ctx.attr.meson_bin]
     tools_deps += ninja_data.deps
@@ -58,6 +58,7 @@ def _create_meson_script(configureParameters):
     """
     ctx = configureParameters.ctx
     attrs = configureParameters.attrs
+    inputs = configureParameters.inputs
 
     script = pkgconfig_script(configureParameters.inputs.ext_build_dirs)
     script.append("##export_var## NINJA {}".format(attrs.ninja_path))
@@ -85,14 +86,21 @@ def _create_meson_script(configureParameters):
         source_dir = "$$EXT_BUILD_ROOT$$/" + root,
     ))
 
-    build_args = " ".join([
+    build_args = [] + ctx.attr.build_args
+    include_dirs = ["$$EXT_BUILD_DEPS$$"] + inputs.include_dirs
+    cmake_prefix_path=";".join(include_dirs)
+    #build_args.append("--cmake-prefix-path {}".format(cmake_prefix_path))
+
+    build_args_str = " ".join([
         ctx.expand_location(arg, data)
-        for arg in ctx.attr.build_args
+        for arg in build_args
     ])
+
+
     script.append("{prefix}{meson} compile {args}".format(
         prefix = prefix,
         meson = attrs.meson_path,
-        args = build_args,
+        args = build_args_str,
     ))
 
     if ctx.attr.install:

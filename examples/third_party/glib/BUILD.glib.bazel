@@ -18,5 +18,10 @@ meson(
     "libgthread-2.0.so.0",
     ],
     out_lib_dir = "lib/x86_64-linux-gnu",
+    deps = ["@pcre", "@zlib"],
+    toolchains = ["@rules_python//python:current_py_toolchain"],
+    env = {
+    "PATH": "$$(dirname $$EXT_BUILD_ROOT$$/$(PYTHON3))"
+    }
 )
 
