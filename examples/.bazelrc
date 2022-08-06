@@ -7,5 +7,5 @@ build --action_env=USERPROFILE
 #build --override_repository=glib=C:\\msys64\\home\\jheaffey\\git\\rules_foreign_cc\\examples\\glib-2.73.2
 
 
-# todo - get this working as i use it in my bazel-example repo
+# todo - get this working as i use it in my bazel-example repo. Perhaps to do with the fact tthat RUNFILES_MANIFEST_ONLY is set in the build_script.sh?
 #build --nobuild_python_zip
