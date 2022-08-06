@@ -78,6 +78,8 @@ def _create_meson_script(configureParameters):
     ## TODO - within the builddir, so meson <path to source dir>. need to allow different generators, default should be ninja. only add ninja to action if ninja is used
     # meson is using ninja from /usr/bin, make sure ninja is on the path, like done in cmake.bzl or cmake_script.bzl
 
+    # TODO like with configure_make, get toolchain vars and prepend command:
+    #toolchain_vars = get_make_env_vars(workspace_name, tools, flags, env_vars, deps, inputs)
     script.append("{prefix}{meson} --prefix={install_dir} {args} {source_dir}".format(
         prefix = prefix,
         meson = attrs.meson_path,
