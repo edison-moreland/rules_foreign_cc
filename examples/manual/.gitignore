@@ -1,0 +1,8 @@
+pcre2*
+glib*
+meson*
+pkg-config*
+zlib*
+libffi*
+gettext*
+proxy-libintl*
