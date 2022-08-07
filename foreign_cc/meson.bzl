@@ -69,6 +69,10 @@ def _create_meson_script(configureParameters):
     attrs = configureParameters.attrs
     inputs = configureParameters.inputs
 
+    # Could just not bother with pkgconfig and cmake here and let target devs do it
+    # ext_build_dir is like external/zlib/copy_zlibb/zlibb, so
+    # external/<repo name>/copy_<target name>/<target name>
+    # Or just fix zlib so that on windows the output matches pkgconfig, i.e the patch that vcpkg applies and remove if(UNIX). In fact this is better because what if @zlib is used in a configure_make rule?
     script = pkgconfig_script(configureParameters.inputs.ext_build_dirs)
     script.append("##export_var## NINJA {}".format(attrs.ninja_path))
 
