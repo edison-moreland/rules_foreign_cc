@@ -31,10 +31,11 @@ def _meson_priv_impl(ctx):
     # :[PyInfo, PyRuntimeInfo, InstrumentedFilesInfo, PyCcLinkParamsProvider, OutputGroupInfo]>
     # TODO - could extract the zip file, use "sed" to change is PythonZip to return False, mv "runfiles" to __main__.py.exe.runfiles.
     # This is turning into a lot of effort for just glib, perhaps rules_foreign_cc just sets enable_runfiles, no_python_zip and windows_enable_symlinks
-    
+    # rules_foreign_cc CI could build libffi with a python zip and glib without one
 
     # TODO move the logic of getting python interpreter path up to here
     meson_path = "$EXT_BUILD_ROOT/" + meson_zip_file
+    meson_path = "$EXT_BUILD_ROOT/" + ctx.executable.meson_bin.path
 
     # TODO - like with cmake (i assume), only add ninja to tool deps if ninja generator is used
     ninja_data = get_ninja_data(ctx)
@@ -87,7 +88,7 @@ def _create_meson_script(configureParameters):
     # TODO use absolutze function that is elsehwere in this repo
     py_interpreter_absolute = "$$EXT_BUILD_ROOT$$/" + py_interpreter
 
-    # TODO - dont do the above if nobuild_python_zip is used, dont know how to check for arg inside a rule
+    # TODO - dont do the above if nobuild_python_zip is used, dont know how to check for arg inside a rule. actually doing python.exe <path to zip> didnt fix the problem, so above logic isnt necessary
 
     ## TODO - within the builddir, so meson <path to source dir>. need to allow different generators, default should be ninja. only add ninja to action if ninja is used
     # meson is using ninja from /usr/bin, make sure ninja is on the path, like done in cmake.bzl or cmake_script.bzl
@@ -97,7 +98,8 @@ def _create_meson_script(configureParameters):
     script.append("{prefix}{meson} --prefix={install_dir} {options} {source_dir}".format(
         prefix = prefix,
         # TODO have this logic of adding these paths and explain why
-        meson = py_interpreter_absolute + " " + attrs.meson_path,
+        # meson = py_interpreter_absolute + " " + attrs.meson_path,
+        meson = attrs.meson_path,
         install_dir="$$INSTALLDIR$$",
         options = options_str,
         source_dir = "$$EXT_BUILD_ROOT$$/" + root,
@@ -117,7 +119,8 @@ def _create_meson_script(configureParameters):
 
     script.append("{prefix}{meson} compile {args}".format(
         prefix = prefix,
-        meson = py_interpreter_absolute + " " + attrs.meson_path,
+        # meson = py_interpreter_absolute + " " + attrs.meson_path,
+        meson = attrs.meson_path,
         args = build_args_str,
     ))
 
@@ -128,7 +131,8 @@ def _create_meson_script(configureParameters):
         ])
         script.append("{prefix}{meson} install {args}".format(
             prefix = prefix,
-            meson = py_interpreter_absolute + " " + attrs.meson_path,
+            #meson = py_interpreter_absolute + " " + attrs.meson_path,
+            meson = attrs.meson_path,
             args = install_args,
         ))
 
