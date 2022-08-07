@@ -20,7 +20,7 @@ cmake(
     },
     lib_source = ":all_srcs",
     out_static_libs = select({
-        "@platforms//os:windows": ["pcre2-8-static.lib"],
+        "@platforms//os:windows": ["pcre2-8.lib"],
         "//conditions:default": ["libpcre.a"],
     }),
 )

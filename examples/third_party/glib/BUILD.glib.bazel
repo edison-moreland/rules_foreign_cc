@@ -2,11 +2,21 @@ load("@rules_foreign_cc//foreign_cc:defs.bzl", "meson")
 
 package(default_visibility = ["//visibility:public"])
 
+config_setting(
+    name = "msvc_compiler",
+    flag_values = {
+        "@bazel_tools//tools/cpp:compiler": "msvc-cl",
+    },
+)
+
 filegroup(
     name = "all_srcs",
     srcs = glob(["**"]),
 )
 
+#TODO - Meson.log shows that submodules are initialised - try to stop this from happening
+# Could it be because rules_foreign_cc runs it differently, rather than running meson from within the source dir?
+# TODO add ability to add  -Dtests=false. like cmake() rule, have something like cache_entries but instead called "options"
 meson(
     name = "glib",
     lib_source = ":all_srcs",
@@ -18,11 +28,27 @@ meson(
     "libgthread-2.0.so.0",
     ],
     out_lib_dir = "lib/x86_64-linux-gnu",
-    deps = ["@pcre", "@zlib"],
+    deps = [
+        "@gettext",
+        "@libffi",
+        "@pcre",
+        "@zlib"
+    ],
+    options = {
+        "tests": "false"
+    },
     # hopefully shouldnt need the below anymore
-    toolchains = ["@rules_python//python:current_py_toolchain"],
-    env = {
-    "PATH": "$$(dirname $$EXT_BUILD_ROOT$$/$(PYTHON3))"
-    }
+    #toolchains = ["@rules_python//python:current_py_toolchain"],
+#    env = {
+#    "PATH": "$$(dirname $$EXT_BUILD_ROOT$$/$(PYTHON3))"
+#    }
+    env = select({
+        ":msvc_compiler": {
+            "INCLUDE": "$$EXT_BUILD_DEPS/include",
+            "LIB": "$$EXT_BUILD_DEPS/lib",
+            "PATH": "$$EXT_BUILD_DEPS/lib",
+        },
+        "//conditions:default": {},
+    }),
 )
 
