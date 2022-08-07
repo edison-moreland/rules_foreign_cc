@@ -14,6 +14,7 @@ filegroup(
 
 cmake(
     name = "pcre",
+    # TODO should set DPCRE2_STATIC_PIC to ON instead. only if using 10.40
     cache_entries = {
         "CMAKE_C_FLAGS": "${CMAKE_C_FLAGS:-} -fPIC",
     },

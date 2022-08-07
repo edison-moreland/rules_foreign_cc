@@ -92,6 +92,7 @@ def _create_meson_script(configureParameters):
     include_dirs = ["$$EXT_BUILD_DEPS$$"] + inputs.include_dirs
     cmake_prefix_path=";".join(include_dirs)
     #build_args.append("--cmake-prefix-path {}".format(cmake_prefix_path))
+    # TODO the cmake_prefix_path should include the folder above the "cmake" folder. e.g. for pcre2, CMAKE_PREFIX_PATH=<pcre2 installdir>, not <pcre2 installdir>/cmake
 
     build_args_str = " ".join([
         ctx.expand_location(arg, data)
