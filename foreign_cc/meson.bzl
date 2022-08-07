@@ -222,6 +222,7 @@ def meson(name, requirements=None, **kwargs):
     meson_priv(
         name = name,
         meson_bin = ":meson_for_{}".format(name),
+        tags = tags,
         **kwargs
     )
 
