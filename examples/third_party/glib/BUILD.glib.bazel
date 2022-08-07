@@ -20,14 +20,37 @@ filegroup(
 meson(
     name = "glib",
     lib_source = ":all_srcs",
-    out_shared_libs = [
-    "libgio-2.0.so.0",
-    "libglib-2.0.so.0",
-    "libgmodule-2.0.so.0",
-    "libgobject-2.0.so.0",
-    "libgthread-2.0.so.0",
-    ],
-    out_lib_dir = "lib/x86_64-linux-gnu",
+    # TODO - have list of libs above and generate per-platform list programatically
+    out_shared_libs = select({
+        "@platforms//os:windows": [
+            "gio-2.0-0.dll",
+            "glib-2.0-0.dll",
+            "gmodule-2.0-0.dll",
+            "gobject-2.0-0.dll",
+            "gthread-2.0-0.dll",
+        ],
+        "//conditions:default": [
+            "libgio-2.0.so.0",
+            "libglib-2.0.so.0",
+            "libgmodule-2.0.so.0",
+            "libgobject-2.0.so.0",
+            "libgthread-2.0.so.0",
+        ],
+    }),
+    out_interface_libs = select({
+        "@platforms//os:windows": [
+            "gio-2.0.lib",
+            "glib-2.0.lib",
+            "gmodule-2.0.lib",
+            "gobject-2.0.lib",
+            "gthread-2.0.lib",
+        ],
+        "//conditions:default": [],
+    }),
+    out_lib_dir = select({
+        "@platforms//os:windows": "lib",
+        "//conditions:default": "lib/x86_64-linux-gnu",
+    }),
     deps = [
         "@gettext",
         "@libffi",
