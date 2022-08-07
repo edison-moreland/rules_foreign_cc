@@ -40,7 +40,7 @@ set PKG_CONFIG_PATH=%cd%\pcre2-10.37\pcre2-install\lib\pkgconfig;%cd%\libffi-mes
 @REM note that pkg-config and gettext binaries were fetched from https://stackoverflow.com/a/22363820
 set CMAKE_PREFIX_PATH=%cd%\zlib-1.2.12\zlib-install
 @REM set PATH=%cd%\bin;%PATH%
-set PATH=%cd%\bin;%cd%\gettext-runtime\bin;%PATH%
+set PATH=%cd%\bin;%cd%\gettext\lib;%PATH%
 set INCLUDE=%INCLUDE%;%cd%\gettext\include
 set LIB=%LIB%;%cd%\gettext\lib
 
