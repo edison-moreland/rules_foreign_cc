@@ -26,7 +26,15 @@ def _meson_priv_impl(ctx):
         list: A list of providers. See `cc_external_rule_impl`
     """
 
-    meson_path = "$EXT_BUILD_ROOT/" + ctx.executable.meson_bin.path
+    meson_zip_file = ctx.attr.meson_bin[OutputGroupInfo].python_zip_file.to_list()[0].path
+    # TODO if --nobuild_python_zip, perhaps the python_zip_file is None or doesn't exist (can do hasattr())
+    # :[PyInfo, PyRuntimeInfo, InstrumentedFilesInfo, PyCcLinkParamsProvider, OutputGroupInfo]>
+    # TODO - could extract the zip file, use "sed" to change is PythonZip to return False, mv "runfiles" to __main__.py.exe.runfiles.
+    # This is turning into a lot of effort for just glib, perhaps rules_foreign_cc just sets enable_runfiles, no_python_zip and windows_enable_symlinks
+    
+
+    # TODO move the logic of getting python interpreter path up to here
+    meson_path = "$EXT_BUILD_ROOT/" + meson_zip_file
 
     # TODO - like with cmake (i assume), only add ninja to tool deps if ninja generator is used
     ninja_data = get_ninja_data(ctx)
@@ -68,23 +76,30 @@ def _create_meson_script(configureParameters):
     data = ctx.attr.data + ctx.attr.build_data
 
     # Generate a list of arguments for meson
-    generate_args = " ".join([
-        ctx.expand_location(arg, data)
-        for arg in ctx.attr.generate_args
+    options_str = " ".join([
+        "-D{}=\"{}\"".format(key, ctx.attr.options[key])
+        for key in ctx.attr.options
     ])
 
     prefix = "{} ".format(expand_locations_and_make_variables(ctx, attrs.tool_prefix, "tool_prefix", data)) if attrs.tool_prefix else ""
+
+    py_interpreter = ctx.toolchains["@bazel_tools//tools/python:toolchain_type"].py3_runtime.interpreter.path
+    # TODO use absolutze function that is elsehwere in this repo
+    py_interpreter_absolute = "$$EXT_BUILD_ROOT$$/" + py_interpreter
+
+    # TODO - dont do the above if nobuild_python_zip is used, dont know how to check for arg inside a rule
 
     ## TODO - within the builddir, so meson <path to source dir>. need to allow different generators, default should be ninja. only add ninja to action if ninja is used
     # meson is using ninja from /usr/bin, make sure ninja is on the path, like done in cmake.bzl or cmake_script.bzl
 
     # TODO like with configure_make, get toolchain vars and prepend command:
     #toolchain_vars = get_make_env_vars(workspace_name, tools, flags, env_vars, deps, inputs)
-    script.append("{prefix}{meson} --prefix={install_dir} {args} {source_dir}".format(
+    script.append("{prefix}{meson} --prefix={install_dir} {options} {source_dir}".format(
         prefix = prefix,
-        meson = attrs.meson_path,
+        # TODO have this logic of adding these paths and explain why
+        meson = py_interpreter_absolute + " " + attrs.meson_path,
         install_dir="$$INSTALLDIR$$",
-        args = generate_args,
+        options = options_str,
         source_dir = "$$EXT_BUILD_ROOT$$/" + root,
     ))
 
@@ -100,10 +115,9 @@ def _create_meson_script(configureParameters):
         for arg in build_args
     ])
 
-
     script.append("{prefix}{meson} compile {args}".format(
         prefix = prefix,
-        meson = attrs.meson_path,
+        meson = py_interpreter_absolute + " " + attrs.meson_path,
         args = build_args_str,
     ))
 
@@ -114,7 +128,7 @@ def _create_meson_script(configureParameters):
         ])
         script.append("{prefix}{meson} install {args}".format(
             prefix = prefix,
-            meson = attrs.meson_path,
+            meson = py_interpreter_absolute + " " + attrs.meson_path,
             args = install_args,
         ))
 
@@ -133,17 +147,6 @@ def _attrs():
             doc = "Arguments for the CMake build command",
             mandatory = False,
         ),
-        "generate_args": attr.string_list(
-            doc = (
-                "Arguments for CMake's generate command. Arguments should be passed as key/value pairs. eg: " +
-                "`[\"-G Ninja\", \"--debug-output\", \"-DFOO=bar\"]`. Note that unless a generator (`-G`) argument " +
-                "is provided, the default generators are [Unix Makefiles](https://cmake.org/cmake/help/latest/generator/Unix%20Makefiles.html) " +
-                "for Linux and MacOS and [Ninja](https://cmake.org/cmake/help/latest/generator/Ninja.html) for " +
-                "Windows."
-            ),
-            mandatory = False,
-            default = [],
-        ),
         "install": attr.bool(
             doc = "If True, the `meson install` comand will be performed after a build",
             default = True,
@@ -157,6 +160,13 @@ def _attrs():
             cfg = "exec",
             executable = True,
             mandatory = True,
+        ),
+        "options": attr.string_dict(
+            doc = (
+                "Meson option entries to initialize (they will be passed with `-Dkey=value`)"
+            ),
+            mandatory = False,
+            default = {},
         ),
         # "install_prefix": attr.string(
         #     doc = (
@@ -181,6 +191,8 @@ meson_priv = rule(
         "@rules_foreign_cc//toolchains:ninja_toolchain",
         "@rules_foreign_cc//foreign_cc/private/framework:shell_toolchain",
         "@bazel_tools//tools/cpp:toolchain_type",
+        # TODO - required to prevent extract of python zipper into tmpdir that is later removed, may not work tho
+        "@bazel_tools//tools/python:toolchain_type"
     ],
     # TODO: Remove once https://github.com/bazelbuild/bazel/issues/11584 is closed and the min supported
     # version is updated to a release of Bazel containing the new default for this setting.
