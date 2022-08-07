@@ -8,4 +8,9 @@ build --action_env=USERPROFILE
 
 
 # todo - get this working as i use it in my bazel-example repo. Perhaps to do with the fact tthat RUNFILES_MANIFEST_ONLY is set in the build_script.sh?
-#build --nobuild_python_zip
+build --nobuild_python_zip
+build --enable_runfiles
+test --enable_runfiles
+startup --windows_enable_symlinks
+
+# link to "Using bazel on windows" and say the above is necessary to have no python zip,which is necessary as glib build attempts to run meson from the extracted meson from the configure step in the tempdir
