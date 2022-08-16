@@ -124,6 +124,29 @@ NINJA_VERSIONS = (
     "1.8.2",
 )
 
+
+
+PKG_CONFIG_URL_TEMPLATE = (
+    "https://download.gnome.org/binaries/win64/dependencies/pkg-config_{full}-{revision}_win64.zip"
+)
+
+PKG_CONFIG_TARGETS = {
+    "win": [
+        "@platforms//cpu:x86_64",
+        "@platforms//os:windows",
+    ],
+}
+
+PKG_CONFIG_VERSIONS = (
+    "0.23",
+)
+
+PKG_CONFIG_URLS = {
+    "gettext": "https://download.gnome.org/binaries/win64/dependencies/gettext-runtime_0.18.1.1-2_win64.zip",
+    "glib": "https://download.gnome.org/binaries/win64/glib/2.26/glib_2.26.1-1_win64.zip"
+}
+
+
 REPO_DEFINITION = """\
 maybe(
     http_archive,
@@ -213,6 +236,42 @@ native_tool_toolchain(
 )
 \"\"\"
 
+_PKG_CONFIG_BUILD_FILE = \"\"\"\\
+load("@rules_foreign_cc//toolchains/native_tools:native_tools_toolchain.bzl", "native_tool_toolchain")
+
+package(default_visibility = ["//visibility:public"])
+
+filegroup(
+    name = "pkg_config_bin",
+    srcs = ["{{bin}}", "glib.dll", "gettext.dll"],
+)
+
+native_tool_toolchain(
+    name = "pkg_config_tool",
+    env = {{env}},
+    path = "$(execpath :pkg_config_bin)",
+    target = ":pkg_config_bin",
+)
+\"\"\"
+
+_GLIB_BUILD_FILE = \"\"\"\\
+package(default_visibility = ["//visibility:public"])
+
+filegroup(
+    name = "glib",
+    srcs = ["glib.dll"],
+)
+\"\"\"
+
+_GETTEXT_BUILD_FILE = \"\"\"\\
+package(default_visibility = ["//visibility:public"])
+
+filegroup(
+    name = "gettext",
+    srcs = ["gettext.dll"],
+)
+\"\"\"
+
 # buildifier: disable=unnamed-macro
 def prebuilt_toolchains(cmake_version, ninja_version, register_toolchains):
     \"\"\"Register toolchains for pre-built cmake and ninja binaries
@@ -224,6 +283,7 @@ def prebuilt_toolchains(cmake_version, ninja_version, register_toolchains):
     \"\"\"
     _cmake_toolchains(cmake_version, register_toolchains)
     _ninja_toolchains(ninja_version, register_toolchains)
+    _pkg_config_toolchains(pkg_config_version, register_toolchains)
     _make_toolchains(register_toolchains)
 
 def _cmake_toolchains(version, register_toolchains):
@@ -232,9 +292,28 @@ def _cmake_toolchains(version, register_toolchains):
 def _ninja_toolchains(version, register_toolchains):
 {ninja_definitions}
 
+def _pkg_config_toolchains(version, register_toolchains):
+{pkg_config_definitions}
+
 def _make_toolchains(register_toolchains):
 {make_definitions}
 """
+
+def download_and_calc_sha256(url):
+    # Get sha256 (can be slow)
+    remote = urllib.request.urlopen(url)
+    total_read = 0
+    max_file_size = 100 * 1024 * 1024
+    hash = hashlib.sha256()
+    while True:
+        data = remote.read(4096)
+        total_read += 4096
+
+        if not data or total_read > max_file_size:
+            break
+
+        hash.update(data)
+    return hash.hexdigest()
 
 
 def get_cmake_definitions() -> str:
@@ -372,20 +451,7 @@ def get_ninja_definitions() -> str:
                 target=target,
             )
 
-            # Get sha256 (can be slow)
-            remote = urllib.request.urlopen(url)
-            total_read = 0
-            max_file_size = 100 * 1024 * 1024
-            hash = hashlib.sha256()
-            while True:
-                data = remote.read(4096)
-                total_read += 4096
-
-                if not data or total_read > max_file_size:
-                    break
-
-                hash.update(data)
-            sha256 = hash.hexdigest()
+            sha256 = download_and_calc_sha256(url)
 
             name = "ninja_{}_{}".format(version, target)
 
@@ -459,6 +525,139 @@ def get_ninja_definitions() -> str:
 
     return "\n".join(archives)
 
+def get_pkg_config_definitions() -> str:
+    """Define a set of repositories and calls for registering `pkg_config` toolchains
+
+    Returns:
+        str: The Implementation of `_pkg_config_toolchains`
+    """
+
+    archives = []
+
+    for version in PKG_CONFIG_VERSIONS:
+
+        version_archives = []
+        version_toolchains = {}
+
+        archives.append(indent('''\
+maybe(
+    http_archive,
+    name = "{name}",
+    urls = [
+        "{url}",
+    ],
+    sha256 = "{sha256}",
+    strip_prefix = "{prefix}",
+    build_file_content = {template}
+)
+'''.format(
+    name="gettext",
+    url=PKG_CONFIG_URLS["gettext"],
+    sha256=download_and_calc_sha256(PKG_CONFIG_URLS["gettext"]),
+    prefix="",
+    template="_GETTEXT_BUILD_FILE"
+)," " * 4))
+
+        archives.append(indent('''\
+maybe(
+    http_archive,
+    name = "{name}",
+    urls = [
+        "{url}",
+    ],
+    sha256 = "{sha256}",
+    strip_prefix = "{prefix}",
+    build_file_content = {template}
+)
+'''.format(
+    name="glib",
+    url=PKG_CONFIG_URLS["glib"],
+    sha256=download_and_calc_sha256(PKG_CONFIG_URLS["glib"]),
+    prefix="",
+    template="_GLIB_BUILD_FILE"
+)," " * 4))
+       
+
+        for target in PKG_CONFIG_TARGETS.keys():
+            url = PKG_CONFIG_URL_TEMPLATE.format(
+                full=version,
+                revision=2,
+            )
+
+            sha256 = download_and_calc_sha256(url)
+
+            name = "pkg_config_{}_{}".format(version, target)
+
+            version_archives.append(
+                REPO_DEFINITION.format(
+                    name=name,
+                    url=url,
+                    sha256=sha256,
+                    prefix="",
+                    build="pkg_config",
+                    template="_PKG_CONFIG_BUILD_FILE",
+                    bin="pkg_config.exe",
+                    env='{\\"PKG_CONFIG\\": \\"$(execpath :pkg_config_bin)\\"}',
+                )
+            )
+            version_toolchains.update({target: name})
+
+        archives.append(
+            "\n".join(
+                [
+                    '    if "{}" == version:'.format(version),
+                ]
+                + [indent(archive, " " * 8) for archive in version_archives]
+            )
+        )
+
+        toolchains_repos = {}
+        for target, name in version_toolchains.items():
+            toolchains_repos.update({name: PKG_CONFIG_TARGETS[target]})
+
+        archives.append(
+            indent(
+                TOOLCHAIN_REPO_DEFINITION.format(
+                    name="pkg_config_{}_toolchains".format(version),
+                    repos=indent(
+                        json.dumps(toolchains_repos, indent=4), " " * 4
+                    ).lstrip(),
+                    tool="pkg_config",
+                ),
+                " " * 8,
+            )
+        )
+
+        archives.append(
+            indent(
+                REGISTER_TOOLCHAINS.format(
+                    toolchains="\n".join(
+                        [
+                            indent(
+                                '"@pkg_config_{}_toolchains//:{}_toolchain",'.format(
+                                    version, repo
+                                ),
+                                " " * 8,
+                            )
+                            for repo in toolchains_repos
+                        ]
+                    )
+                ),
+                " " * 8,
+            )
+        )
+
+        archives.extend(
+            [
+                indent("return", " " * 8),
+                "",
+            ]
+        )
+
+    archives.append(indent('fail("Unsupported version: " + str(version))', " " * 4))
+
+    return "\n".join(archives)
+
 
 def get_make_definitions() -> str:
     """Define a set of repositories and calls for registering `make` toolchains
@@ -478,6 +677,7 @@ def main():
         BZL_FILE_TEMPLATE.format(
             cmake_definitions=get_cmake_definitions(),
             ninja_definitions=get_ninja_definitions(),
+            pkg_config_definitions=get_pkg_config_definitions(),
             make_definitions=get_make_definitions(),
         )
     )
