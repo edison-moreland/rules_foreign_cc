@@ -60,7 +60,7 @@ package(default_visibility = ["//visibility:public"])
 
 filegroup(
     name = "pkg_config_bin",
-    srcs = ["{bin}", "glib.dll", "gettext.dll"],
+    srcs = ["{bin}"],
 )
 
 native_tool_toolchain(
@@ -109,9 +109,9 @@ cc_import(
 _GETTEXT_BUILD_FILE = """\
 package(default_visibility = ["//visibility:public"])
 
-filegroup(
+cc_import(
     name = "gettext",
-    srcs = ["gettext.dll"],
+    shared_library = "bin/lintintl-8.dll",
 )
 """
 
@@ -4702,7 +4702,7 @@ def _ninja_toolchains(version, register_toolchains):
 def _pkg_config_toolchains(version, register_toolchains):
     maybe(
         http_archive,
-        name = "gettext",
+        name = "gettext_runtime",
         urls = [
             "https://download.gnome.org/binaries/win64/dependencies/gettext-runtime_0.18.1.1-2_win64.zip",
         ],
@@ -4713,7 +4713,7 @@ def _pkg_config_toolchains(version, register_toolchains):
 
     maybe(
         http_archive,
-        name = "glib",
+        name = "glib_runtime",
         urls = [
             "https://download.gnome.org/binaries/win64/glib/2.26/glib_2.26.1-1_win64.zip",
         ],
@@ -4732,7 +4732,7 @@ def _pkg_config_toolchains(version, register_toolchains):
             sha256 = "bf29de75400556db7a6e98020e576a3cb7f3f0e5e97d224fb35154812f8eea4a",
             strip_prefix = "",
             build_file_content = _PKG_CONFIG_BUILD_FILE.format(
-                bin = "pkg_config.exe",
+                bin = "bin/pkg-config.exe",
                 env = "{\"PKG_CONFIG\": \"$(execpath :pkg_config_bin)\"}",
             ),
         )

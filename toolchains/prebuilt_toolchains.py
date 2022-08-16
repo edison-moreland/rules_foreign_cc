@@ -142,8 +142,8 @@ PKG_CONFIG_VERSIONS = (
 )
 
 PKG_CONFIG_URLS = {
-    "gettext": "https://download.gnome.org/binaries/win64/dependencies/gettext-runtime_0.18.1.1-2_win64.zip",
-    "glib": "https://download.gnome.org/binaries/win64/glib/2.26/glib_2.26.1-1_win64.zip"
+    "gettext_runtime": "https://download.gnome.org/binaries/win64/dependencies/gettext-runtime_0.18.1.1-2_win64.zip",
+    "glib_runtime": "https://download.gnome.org/binaries/win64/glib/2.26/glib_2.26.1-1_win64.zip"
 }
 
 
@@ -292,9 +292,9 @@ cc_import(
 _GETTEXT_BUILD_FILE = \"\"\"\\
 package(default_visibility = ["//visibility:public"])
 
-filegroup(
+cc_import(
     name = "gettext",
-    srcs = ["gettext.dll"],
+    shared_library = "bin/lintintl-8.dll",
 )
 \"\"\"
 
@@ -577,9 +577,9 @@ maybe(
     build_file_content = {template}
 )
 '''.format(
-    name="gettext",
-    url=PKG_CONFIG_URLS["gettext"],
-    sha256=download_and_calc_sha256(PKG_CONFIG_URLS["gettext"]),
+    name="gettext_runtime",
+    url=PKG_CONFIG_URLS["gettext_runtime"],
+    sha256=download_and_calc_sha256(PKG_CONFIG_URLS["gettext_runtime"]),
     prefix="",
     template="_GETTEXT_BUILD_FILE"
 )," " * 4))
@@ -596,9 +596,9 @@ maybe(
     build_file_content = {template}
 )
 '''.format(
-    name="glib",
-    url=PKG_CONFIG_URLS["glib"],
-    sha256=download_and_calc_sha256(PKG_CONFIG_URLS["glib"]),
+    name="glib_runtime",
+    url=PKG_CONFIG_URLS["glib_runtime"],
+    sha256=download_and_calc_sha256(PKG_CONFIG_URLS["glib_runtime"]),
     prefix="",
     template="_GLIB_BUILD_FILE"
 )," " * 4))
@@ -622,7 +622,7 @@ maybe(
                     prefix="",
                     build="pkg_config",
                     template="_PKG_CONFIG_BUILD_FILE",
-                    bin="pkg_config.exe",
+                    bin="bin/pkg-config.exe",
                     env='{\\"PKG_CONFIG\\": \\"$(execpath :pkg_config_bin)\\"}',
                 )
             )
