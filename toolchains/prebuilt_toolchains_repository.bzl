@@ -66,7 +66,7 @@ prebuilt_toolchains_repository = repository_rule(
         "tool": attr.string(
             doc = "The name of the tool the toolchains represent",
             mandatory = True,
-            values = ["cmake", "ninja"],
+            values = ["cmake", "ninja", "pkgconfig"],
         ),
     },
 )

@@ -12,6 +12,7 @@ def rules_foreign_cc_dependencies(
         cmake_version = "3.23.2",
         make_version = "4.3",
         ninja_version = "1.11.0",
+        pkg_config_version = "0.23",
         register_preinstalled_tools = True,
         register_built_tools = True,
         register_toolchains = True):
@@ -38,6 +39,8 @@ def rules_foreign_cc_dependencies(
         ninja_version: The target version of the ninja toolchain if `register_default_tools`
             or `register_built_tools` is set to `True`.
 
+        pkg_config_version: The target version of the pkg_config toolchain if `register_default_tools` is set to `True`
+
         register_preinstalled_tools: If true, toolchains will be registered for the native built tools
             installed on the exec host
 
@@ -59,7 +62,7 @@ def rules_foreign_cc_dependencies(
         )
 
     if register_default_tools:
-        prebuilt_toolchains(cmake_version, ninja_version, register_toolchains)
+        prebuilt_toolchains(cmake_version, ninja_version, pkg_config_version, register_toolchains)
 
     if register_built_tools:
         built_toolchains(

@@ -72,11 +72,37 @@ native_tool_toolchain(
 """
 
 _GLIB_BUILD_FILE = """\
+load("@rules_cc//cc:defs.bzl", "cc_import")
 package(default_visibility = ["//visibility:public"])
 
 filegroup(
+    name = "glib_libs",
+    srcs = [":gio", ":glib", ":gmodule", "gobject", "gthread"],
+)
+
+cc_import(
+    name = "gio",
+    shared_library = "bin/libgio-2.0-0.dll",
+)
+
+cc_import(
     name = "glib",
-    srcs = ["glib.dll"],
+    shared_library = "bin/libglib-2.0-0.dll",
+)
+
+cc_import(
+    name = "gmodule",
+    shared_library = "bin/libgmodule-2.0-0.dll",
+)
+
+cc_import(
+    name = "gobject",
+    shared_library = "bin/libgobject-2.0-0.dll",
+)
+
+cc_import(
+    name = "gthread",
+    shared_library = "bin/libgthread-2.0-0.dll",
 )
 """
 
@@ -90,7 +116,7 @@ filegroup(
 """
 
 # buildifier: disable=unnamed-macro
-def prebuilt_toolchains(cmake_version, ninja_version, register_toolchains):
+def prebuilt_toolchains(cmake_version, ninja_version, pkg_config_version, register_toolchains):
     """Register toolchains for pre-built cmake and ninja binaries
 
     Args:
@@ -4721,7 +4747,7 @@ def _pkg_config_toolchains(version, register_toolchains):
                     "@platforms//os:windows"
                 ]
             },
-            tool = "pkg_config",
+            tool = "pkgconfig",
         )
 
         if register_toolchains:

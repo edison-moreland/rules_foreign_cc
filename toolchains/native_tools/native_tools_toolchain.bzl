@@ -40,10 +40,11 @@ def _native_tool_toolchain_impl(ctx):
 
 native_tool_toolchain = rule(
     doc = (
-        "Rule for defining the toolchain data of the native tools (cmake, ninja), " +
+        "Rule for defining the toolchain data of the native tools (cmake, ninja, pkg_config), " +
         "to be used by rules_foreign_cc with toolchain types " +
-        "`@rules_foreign_cc//toolchains:cmake_toolchain` and " +
-        "`@rules_foreign_cc//toolchains:ninja_toolchain`."
+        "`@rules_foreign_cc//toolchains:cmake_toolchain`, " + 
+        "`@rules_foreign_cc//toolchains:ninja_toolchain` and " +
+        "`@rules_foreign_cc//toolchains:pkgconfig_toolchain`."
     ),
     implementation = _native_tool_toolchain_impl,
     attrs = {
