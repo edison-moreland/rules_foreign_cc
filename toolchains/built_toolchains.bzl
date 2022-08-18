@@ -31,11 +31,12 @@ _CMAKE_SRCS = {
 }
 
 # buildifier: disable=unnamed-macro
-def built_toolchains(cmake_version, make_version, ninja_version, register_toolchains):
+def built_toolchains(cmake_version, make_version, ninja_version, pkgconfig_version, register_toolchains):
     """Register toolchains for built tools that will be built from source"""
     _cmake_toolchain(cmake_version, register_toolchains)
     _make_toolchain(make_version, register_toolchains)
     _ninja_toolchain(ninja_version, register_toolchains)
+    _pkgconfig_toolchain(pkgconfig_version, register_toolchains)
 
 def _cmake_toolchain(version, register_toolchains):
     if register_toolchains:
@@ -459,6 +460,28 @@ def _ninja_toolchain(version, register_toolchains):
             strip_prefix = "ninja-1.10.2",
             urls = [
                 "https://github.com/ninja-build/ninja/archive/v1.10.2.tar.gz",
+            ],
+        )
+        return
+
+    fail("Unsupported ninja version: " + str(version))
+
+def _pkgconfig_toolchain(version, register_toolchains):
+    if register_toolchains:
+        native.register_toolchains(
+            "@rules_foreign_cc//toolchains:built_pkgconfig_toolchain",
+        )
+    if version == "0.29.2":
+        maybe(
+            http_archive,
+            name = "pkgconfig_src",
+            build_file_content = _ALL_CONTENT,
+            sha256 = "6fc69c01688c9458a57eb9a1664c9aba372ccda420a02bf4429fe610e7e7d591",
+            strip_prefix = "pkg-config-0.29.2",
+            # The patch is required as bazel does not provide the VCINSTALLDIR or WINDOWSSDKDIR vars
+            patches = [Label("//toolchains:pkgconfig-windows.patch")],
+            urls = [
+                "https://pkgconfig.freedesktop.org/releases/pkg-config-0.29.2.tar.gz",
             ],
         )
         return
