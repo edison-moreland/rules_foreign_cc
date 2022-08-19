@@ -404,7 +404,7 @@ def cc_external_rule_impl(ctx, attrs):
     inputs = _define_inputs(attrs)
     outputs = _define_outputs(ctx, attrs, lib_name)
     out_cc_info = _define_out_cc_info(ctx, attrs, inputs, outputs)
-    print(out_cc_info)
+    # print(out_cc_info)
 
     lib_header = "Bazel external C/C++ Rules. Building library '{}'".format(lib_name)
 
