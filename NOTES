@@ -7,3 +7,6 @@ note that at run time it depends on various things, run "ldd" in mingw64 msys2, 
 
 for linux, use ./configure --internal-glib or whatever it is
 
+----
+try to resolve - https://github.com/bazelbuild/rules_foreign_cc/issues/391, i.e pkg-config needs to be run with dlls, as will qt binaries. Could make a wrapper script that sets PATH on win or LD_LBIRARY_PATH on linux. Ideally the binaries produced by rules_foreign_cc will be like cc_binaries
+

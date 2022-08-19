@@ -37,9 +37,19 @@ def pkgconfig_tool(name, srcs, **kwargs):
         **kwargs
     )
 
+    # native.filegroup(
+    #     name = name,
+    #     srcs = ["{}.build".format(name)],
+    #     output_group = "gen_dir",
+    #     tags = tags,
+    # )
+
     native.filegroup(
         name = name,
         srcs = ["{}.build".format(name)],
-        output_group = "gen_dir",
+        output_group = select({
+            "@platforms//os:windows": "pkg-config.exe",
+            "//conditions:default": "pkg-config",
+        }),
         tags = tags,
     )

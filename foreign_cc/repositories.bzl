@@ -54,13 +54,6 @@ def rules_foreign_cc_dependencies(
     if register_toolchains:
         native.register_toolchains(*native_tools_toolchains)
 
-        native.register_toolchains(
-            "@rules_foreign_cc//toolchains:preinstalled_autoconf_toolchain",
-            "@rules_foreign_cc//toolchains:preinstalled_automake_toolchain",
-            "@rules_foreign_cc//toolchains:preinstalled_m4_toolchain",
-            "@rules_foreign_cc//toolchains:preinstalled_pkgconfig_toolchain",
-        )
-
     if register_default_tools:
         prebuilt_toolchains(cmake_version, ninja_version, register_toolchains)
 

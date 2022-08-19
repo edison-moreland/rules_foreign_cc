@@ -154,6 +154,7 @@ load(
     "get_cmake_data",
     "get_make_data",
     "get_ninja_data",
+    "get_pkgconfig_data"
 )
 
 def _cmake_impl(ctx):

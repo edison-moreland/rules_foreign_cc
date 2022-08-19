@@ -280,12 +280,12 @@ pkgconfig_tool(
 native_tool_toolchain(
     name = "built_pkgconfig",
     env = select({
-        "@platforms//os:windows": {"PKG_CONFIG": "$(execpath :pkgconfig_tool)/bin/pkgconfig.exe"},
-        "//conditions:default": {"PKG_CONFIG": "$(execpath :pkgconfig_tool)/bin/pkgconfig.exe"},
+        "@platforms//os:windows": {"PKG_CONFIG": "$(execpath :pkgconfig_tool)"},
+        "//conditions:default": {"PKG_CONFIG": "$(execpath :pkgconfig_tool)"},
     }),
     path = select({
-        "@platforms//os:windows": "$(execpath :cmake_tool)/bin/pkgconfig.exe",
-        "//conditions:default": "$(execpath :cmake_tool)/bin/pkgconfig",
+        "@platforms//os:windows": "$(execpath :pkgconfig_tool)",
+        "//conditions:default": "$(execpath :pkgconfig_tool)",
     }),
     target = ":pkgconfig_tool",
 )
