@@ -10,15 +10,16 @@ def pkgconfig_tool(name, srcs, **kwargs):
         lib_source = srcs,
         args = [
                 "-f Makefile.vc",
-                "CFG=release"
+                "CFG=release",
+                "GLIB_PREFIX=\"$$EXT_BUILD_ROOT/external/glib_dev\""
             ],
         out_binaries = select({
             "@platforms//os:windows": ["pkg-config.exe"],
             "//conditions:default": ["pkg-config"],
         }),
-        #TODO change make rule to append the INCLUDE var if using nmake
+        #TODO change make rule to set the appropriate NMAKE flag when using nmake, rather than cppflags="-I<include dir>"
         env = select({
-            "@platforms//os:windows": {"INCLUDE": "$$INCLUDE;$$EXT_BUILD_ROOT/external/glib_src"},
+            "@platforms//os:windows": {"INCLUDE": "$$EXT_BUILD_ROOT/external/glib_src"},
             "//conditions:default": {},
         }),
         out_static_libs = [],
@@ -27,6 +28,10 @@ def pkgconfig_tool(name, srcs, **kwargs):
             "@glib_dev",
             "@glib_src//:msvc_hdr"
         ],
+        postfix_script = select({
+            "@platforms//os:windows": "cp release/x64/pkg-config.exe $$INSTALLDIR$$/bin",
+            "//conditions:default": "",
+        }),
         toolchain = "@rules_foreign_cc//toolchains:preinstalled_nmake_toolchain",
         tags = tags,
         **kwargs

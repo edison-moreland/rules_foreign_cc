@@ -89,7 +89,7 @@ def _attrs():
                 "Passed as an arg to \"make\" as PREFIX=<install_prefix>."
             ),
             mandatory = False,
-            default = "$$INSTALLDIR$$",
+            default = "$$$INSTALLDIR",
         ),
         "targets": attr.string_list(
             doc = (

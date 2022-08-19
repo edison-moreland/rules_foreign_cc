@@ -274,6 +274,9 @@ dependencies.""",
     ),
 )
 
+def _is_msvc_var(var):
+    return var == "INCLUDE" or var == "LIB"
+
 def get_env_prelude(ctx, lib_name, data_dependencies, target_root):
     """Generate a bash snippet containing environment variable definitions
 
@@ -319,10 +322,20 @@ def get_env_prelude(ctx, lib_name, data_dependencies, target_root):
     user_vars = expand_locations_and_make_variables(ctx, ctx.attr.env, "env", data_dependencies)
     env.update(user_vars)
 
-    # If user has defined a PATH variable (e.g. PATH, LD_LIBRARY_PATH, CPATH) prepend it to the existing variable
+    cc_toolchain = find_cpp_toolchain(ctx)
+
+    # If user has defined an existing variable (e.g. PATH, LD_LIBRARY_PATH, CPATH, INCLUDE, LIB) prepend it to the existing variable
     for user_var in user_vars:
-        if "PATH" in user_var and cc_env.get(user_var):
-            env.update({user_var: user_vars.get(user_var) + ":" + cc_env.get(user_var)})
+        is_existing_var = "PATH" in user_var or _is_msvc_var(user_var)
+        list_delimiter = ";" if _is_msvc_var(user_var) else ":"
+        if is_existing_var and cc_env.get(user_var):
+            env.update({user_var: user_vars.get(user_var) + list_delimiter + cc_env.get(user_var)})
+
+    # TODO - say in commit message i had to move this as didnt take effect if user specified PATH
+    if cc_toolchain.compiler == "msvc-cl":
+        # Prepend PATH environment variable with the path to the toolchain linker, which prevents MSYS using its linker (/usr/bin/link.exe) rather than the MSVC linker (both are named "link.exe")
+        linker_path = paths.dirname(cc_toolchain.ld_executable)
+        env.update({"PATH": _normalize_path(linker_path) + ":" + env.get("PATH")})
 
     cc_toolchain = find_cpp_toolchain(ctx)
     if cc_toolchain.compiler == "msvc-cl":
