@@ -8,3 +8,7 @@ bzl_library(
         "//foreign_cc/built_tools/private:bzl_srcs",
     ],
 )
+
+exports_files([
+    "pkgconfig_wrapper.sh",
+])

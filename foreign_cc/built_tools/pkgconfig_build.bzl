@@ -45,11 +45,17 @@ def pkgconfig_tool(name, srcs, **kwargs):
     # )
 
     native.filegroup(
-        name = name,
+        name = name + "_bin",
         srcs = ["{}.build".format(name)],
         output_group = select({
             "@platforms//os:windows": "pkg-config.exe",
             "//conditions:default": "pkg-config",
         }),
         tags = tags,
+    )
+
+    native.sh_binary(
+        name = name,
+        srcs = ["@rules_foreign_cc//foreign_cc/built_tools:pkgconfig_wrapper.sh"],
+        data = ["{}.build".format(name), name + "_bin"],
     )

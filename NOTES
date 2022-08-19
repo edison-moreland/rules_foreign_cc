@@ -10,3 +10,7 @@ for linux, use ./configure --internal-glib or whatever it is
 ----
 try to resolve - https://github.com/bazelbuild/rules_foreign_cc/issues/391, i.e pkg-config needs to be run with dlls, as will qt binaries. Could make a wrapper script that sets PATH on win or LD_LBIRARY_PATH on linux. Ideally the binaries produced by rules_foreign_cc will be like cc_binaries
 
+Seems like there is a CcLauncherInfo but can only be used in native java, which copies dlls to the binary dir
+
+What can I do instead? I can write a sh_binary that sets the PATH variable when being run
+
