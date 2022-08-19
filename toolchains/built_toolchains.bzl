@@ -471,6 +471,64 @@ def _pkgconfig_toolchain(version, register_toolchains):
         native.register_toolchains(
             "@rules_foreign_cc//toolchains:built_pkgconfig_toolchain",
         )
+
+    maybe(
+        http_archive,
+        name = "glib_dev",
+        build_file_content = '''
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
+cc_import(
+    name = "glib_dev",
+    hdrs = glob(["include/**"]),
+    shared_library = "@glib_runtime//:bin/libglib-2.0-0.dll",
+    visibility = ["//visibility:public"],
+)
+        ''',
+        sha256 = "bdf18506df304d38be98a4b3f18055b8b8cca81beabecad0eece6ce95319c369",
+        urls = [
+            "https://download.gnome.org/binaries/win64/glib/2.26/glib-dev_2.26.1-1_win64.zip",
+        ],
+    )
+
+    maybe(
+        http_archive,
+        name = "glib_src",
+        build_file_content = '''
+cc_import(
+    name = "msvc_hdr",
+    hdrs = ["msvc_recommended_pragmas.h"],
+    visibility = ["//visibility:public"],
+)
+        ''',
+        sha256 = "bc96f63112823b7d6c9f06572d2ad626ddac7eb452c04d762592197f6e07898e",
+        strip_prefix= "glib-2.26.1",
+        urls = [
+            "https://download.gnome.org/sources/glib/2.26/glib-2.26.1.tar.gz",
+        ],
+    )
+
+
+    maybe(
+        http_archive,
+        name = "glib_runtime",
+        build_file_content = '''
+exports_files(
+    [
+        "bin/libgio-2.0-0.dll",
+        "bin/libglib-2.0-0.dll",
+        "bin/libgmodule-2.0-0.dll",
+        "bin/libgobject-2.0-0.dll",
+        "bin/libgthread-2.0-0.dll",
+    ],
+    visibility = ["//visibility:public"],
+)
+        ''',
+        sha256 = "88d857087e86f16a9be651ee7021880b3f7ba050d34a1ed9f06113b8799cb973",
+        urls = [
+            "https://download.gnome.org/binaries/win64/glib/2.26/glib_2.26.1-1_win64.zip"
+        ],
+    )
     if version == "0.29.2":
         maybe(
             http_archive,
