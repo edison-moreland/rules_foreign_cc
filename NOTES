@@ -14,3 +14,5 @@ Seems like there is a CcLauncherInfo but can only be used in native java, which 
 
 What can I do instead? I can write a sh_binary that sets the PATH variable when being run
 
+make a macro that uses bin output group to make a sh_binary
+

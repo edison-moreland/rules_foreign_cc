@@ -483,6 +483,8 @@ def cc_external_rule_impl(ctx, attrs):
     # environments. This should not be replaced with `run` until a cross platform implementation
     # is found that guarantees bash exists or appropriately errors out.
 
+    ## TODO make sure transitive runfiles (eg shared libs) are aded: https://bazel.build/extending/rules#runfiles
+
     tool_runfiles = []
     for data in data_dependencies:
         tool_runfiles += data[DefaultInfo].default_runfiles.files.to_list()
