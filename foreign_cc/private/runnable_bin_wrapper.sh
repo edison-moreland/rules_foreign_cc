@@ -1,6 +1,16 @@
 #!/bin/bash
 
-find
+BIN=$1
+shift
+
+readarray -d '' SHARED_LIBS_ARRAY < <(find . -name "*.so" -print0)
+
+for lib in "${SHARED_LIBS_ARRAY[@]}"; do
+export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:$(dirname $(realpath $lib))
+done
+
+$BIN $@
+
 
 # have to --enable_runfiles
 

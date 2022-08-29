@@ -1,5 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_test")
-load("@rules_foreign_cc//foreign_cc:defs.bzl", "cmake")
+load("@rules_foreign_cc//foreign_cc:defs.bzl", "cmake", "runnable_bin")
 
 # Example of the cmake_external target built with Bazel-built dependency
 cmake(
@@ -32,4 +32,13 @@ cc_test(
         # liba should come from transitive dependencies
         ":cmake_libb",
     ],
+)
+
+runnable_bin(
+    name = "runnable_hello",
+    binary = select({
+        "//:windows": "hello.exe",
+        "//conditions:default": "hello",
+    }),
+    foreign_cc_target = "libhello"
 )

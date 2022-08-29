@@ -534,6 +534,7 @@ def cc_external_rule_impl(ctx, attrs):
         wrapped_outputs.wrapper_script_file,
     ]
     output_groups[attrs.configure_name + "_logs"] = wrapped_files
+    print("runfiles are  - ", runfiles.files)
     return [
         DefaultInfo(
             files = depset(direct = rule_outputs),

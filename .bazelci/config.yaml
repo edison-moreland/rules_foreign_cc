@@ -116,10 +116,6 @@ tasks:
       - "-//cmake_android/..."
       # TODO: Fix `error C2118: negative subscript`
       - "-//cmake_defines/..."
-      # TODO: Fix linker error
-      - "-//cmake_synthetic/..."
-      # TODO: Fix `error LNK2019: unresolved external symbol hello_func`
-      - "-//cmake_hello_world_lib/shared/..."
       # TODO: Fix `CreateProcess failed: The system cannot find the file specified.`
       - "-//ninja_simple/..."
       # TODO: The use of Visual Studio generator targets are broken. These should
