@@ -18,16 +18,14 @@ readarray -d '' SHARED_LIBS_ARRAY < <(find . -name "*${SHARED_LIB_SUFFIX}" -prin
 
 declare -A SHARED_LIBS_DIRS_ARRAY
 for lib in "${SHARED_LIBS_ARRAY[@]}"; do
-    SHARED_LIBS_DIRS_ARRAY[$lib]=1
+    SHARED_LIBS_DIRS_ARRAY[$(dirname $(realpath $lib))]=1
 done
-echo ${!SHARED_LIBS_DIRS_ARRAY[@]}
 
+for dir in "${!SHARED_LIBS_DIRS_ARRAY[@]}"; do
+    export ${LIB_PATH_VAR}=${!LIB_PATH_VAR}:$dir
+done
 
-# for lib in "${SHARED_LIBS_ARRAY[@]}"; do
-# export ${LIB_PATH_VAR}=${!LIB_PATH_VAR}:$(dirname $(realpath $lib))
-# done
-
-# $BIN $@
+$BIN $@
 
 
 # have to --enable_runfiles
