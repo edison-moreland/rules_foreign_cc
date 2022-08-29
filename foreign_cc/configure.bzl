@@ -26,7 +26,7 @@ def _configure_make(ctx):
     make_data = get_make_data(ctx)
     pkg_config_data = get_pkgconfig_data(ctx)
 
-    print(pkg_config_data.deps[0][DefaultInfo].files_to_run.executable)
+    #print(pkg_config_data.deps[0][DefaultInfo].files_to_run.executable)
 
     #struct(data_runfiles = <unknown object com.google.devtools.build.lib.analysis.Runfiles>, default_runfiles = <unknown object com.google.devtools.build.lib.analysis.Runfiles>, files = depset([<generated file external/rules_foreign_cc/toolchains/pkgconfig_tool.build_/bin/pkg-config.exe>]), files_to_run = <unknown object com.google.devtools.build.lib.analysis.FilesToRunProvider>)
 

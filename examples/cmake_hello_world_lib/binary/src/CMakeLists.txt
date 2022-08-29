@@ -3,7 +3,9 @@
 
 cmake_minimum_required(VERSION 2.8.4)
 
-add_library(hello_lib STATIC hello.c hello.h)
+set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+
+add_library(hello_lib SHARED hello.c hello.h)
 
 IF (WIN32)
   set(LIB_NAME "libhello")
@@ -27,7 +29,7 @@ set_target_properties(myapp PROPERTIES
 install(
  TARGETS
  hello_lib
- ARCHIVE DESTINATION lib
+ LIBRARY DESTINATION lib
 )
 
 install(
