@@ -9,15 +9,16 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
 elif [[ "$OSTYPE" == "darwin"* ]]; then
     SHARED_LIB_SUFFIX=".dylib"
     LIB_PATH_VAR=PATH
-elif [[ "$OSTYPE" == "msys" ] || [ "$OSTYPE" == "cygwin" ]]; then
+elif [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" ]]; then
     SHARED_LIB_SUFFIX=".dll"
     LIB_PATH_VAR=PATH
 fi
 
 readarray -d '' SHARED_LIBS_ARRAY < <(find . -name "*${SHARED_LIB_SUFFIX}" -print0)
 
+
 for lib in "${SHARED_LIBS_ARRAY[@]}"; do
-export ${!LIB_PATH_VAR}=${!LIB_PATH_VAR}:$(dirname $(realpath $lib))
+export ${LIB_PATH_VAR}=${!LIB_PATH_VAR}:$(dirname $(realpath $lib))
 done
 
 $BIN $@
