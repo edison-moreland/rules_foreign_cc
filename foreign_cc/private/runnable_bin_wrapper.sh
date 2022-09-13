@@ -22,7 +22,7 @@ for lib in "${SHARED_LIBS_ARRAY[@]}"; do
 done
 
 for dir in "${!SHARED_LIBS_DIRS_ARRAY[@]}"; do
-    export ${LIB_PATH_VAR}=${!LIB_PATH_VAR}:$dir
+    export ${LIB_PATH_VAR}="${!LIB_PATH_VAR}":"$dir"
 done
 
 $BIN $@
