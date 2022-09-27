@@ -1,8 +1,5 @@
 #!/bin/bash
 
-BIN=$1
-shift
-
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     SHARED_LIB_SUFFIX=".so"
     LIB_PATH_VAR=LD_LIBRARY_PATH
@@ -25,7 +22,7 @@ for dir in "${!SHARED_LIBS_DIRS_ARRAY[@]}"; do
     export ${LIB_PATH_VAR}="${!LIB_PATH_VAR}":"$dir"
 done
 
-$BIN $@
+BIN $@
 
 
 # have to --enable_runfiles

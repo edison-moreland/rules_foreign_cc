@@ -46,3 +46,67 @@ def runnable_binary(name, binary, foreign_cc_target, **kwargs):
         ],
         **kwargs
     )
+
+    native.genrule(
+        name = "blob",
+        srcs=[name],
+        outs=["blob.txt"],
+        cmd="ls $(locations {})".format(name),
+        executable=True
+    )
+
+#     native.genrule(
+#         name = name,
+#         srcs = ["@rules_foreign_cc//foreign_cc/private:runnable_bin_wrapper.sh", name + "_fg", foreign_cc_target],
+#         outs = ["runnable_{}".format(name)],
+#         executable= True,
+#         cmd = """
+# if [[ "$$OSTYPE" == "linux-gnu"* ]]; then
+#     SHARED_LIB_SUFFIX=".so"
+#     LIB_PATH_VAR=LD_LIBRARY_PATH
+# elif [[ "$$OSTYPE" == "darwin"* ]]; then
+#     SHARED_LIB_SUFFIX=".dylib"
+#     LIB_PATH_VAR=PATH
+# elif [[ "$$OSTYPE" == "msys" || "$$OSTYPE" == "cygwin" ]]; then
+#     SHARED_LIB_SUFFIX=".dll"
+#     LIB_PATH_VAR=PATH
+# fi
+
+# readarray -d '' SHARED_LIBS_ARRAY < <(find . -name "*$$SHARED_LIB_SUFFIX" -print0)
+
+# declare -A SHARED_LIBS_DIRS_ARRAY
+# for lib in "$${{SHARED_LIBS_ARRAY[@]}}"; do
+#     SHARED_LIBS_DIRS_ARRAY[$$(dirname $$(realpath $$lib))]=1
+# done
+
+# for dir in "$${{!SHARED_LIBS_DIRS_ARRAY[@]}}"; do
+#     export $$LIB_PATH_VAR="$${{!LIB_PATH_VAR}}":"$$dir"
+# done
+
+#  $(location {}) $$@
+#         """.format(name + "_fg"),
+#         **kwargs
+#     )
+
+    # Seems that "bazel run" on windows will try to run the blob.sh output as is and fail to do so. Instead, create a sh_binary from blob.sh generated here
+    native.genrule(
+        name = "blob2",
+        srcs = ["@rules_foreign_cc//foreign_cc/private:runnable_bin_wrapper.sh", name + "_fg"],
+        outs = ["blob.sh"],
+        cmd = "sed s@BIN@$(location {})@g $(location @rules_foreign_cc//foreign_cc/private:runnable_bin_wrapper.sh) > $@".format(name + "_fg"),
+        executable=True,
+        # cmd = "ls $(location {}) > $@".format(name + "_fg")
+    )
+
+    # But now the blob.sh has the path to the exe to run in the build tree rather than in the sh_bin
+    native.sh_binary(
+        name = "blob3",
+        srcs = ["blob2"],
+        data = [
+            name + "_fg",
+            foreign_cc_target
+        ],
+        **kwargs
+    )
+
+    # Instead do this approach - https://stackoverflow.com/questions/53472993/how-do-i-make-a-bazel-sh-binary-target-depend-on-other-binary-targets/53481508#53481508
