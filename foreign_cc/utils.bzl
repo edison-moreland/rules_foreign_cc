@@ -93,7 +93,7 @@ def runnable_binary(name, binary, foreign_cc_target, **kwargs):
         name = "blob2",
         srcs = ["@rules_foreign_cc//foreign_cc/private:runnable_bin_wrapper.sh", name + "_fg"],
         outs = ["blob.sh"],
-        cmd = "sed s@BIN@$(location {})@g $(location @rules_foreign_cc//foreign_cc/private:runnable_bin_wrapper.sh) > $@".format(name + "_fg"),
+        cmd = "sed s@BIN@$(rootpath {})@g $(location @rules_foreign_cc//foreign_cc/private:runnable_bin_wrapper.sh) > $@".format(name + "_fg"),
         executable=True,
         # cmd = "ls $(location {}) > $@".format(name + "_fg")
     )
@@ -101,6 +101,7 @@ def runnable_binary(name, binary, foreign_cc_target, **kwargs):
     # But now the blob.sh has the path to the exe to run in the build tree rather than in the sh_bin
     native.sh_binary(
         name = "blob3",
+        deps = ["@bazel_tools//tools/bash/runfiles"],
         srcs = ["blob2"],
         data = [
             name + "_fg",
@@ -109,4 +110,67 @@ def runnable_binary(name, binary, foreign_cc_target, **kwargs):
         **kwargs
     )
 
+    native.genrule(
+        name = "blob3_2",
+        tools = ["blob3"],
+        outs = ["blob3_2.sh"],
+        cmd = "$(location blob3)",
+        executable=True,
+        # cmd = "ls $(location {}) > $@".format(name + "_fg")
+    )    
+
+    native.sh_binary(
+        name = "blob4",
+        srcs = ["@rules_foreign_cc//foreign_cc/private:runnable_bin_wrapper.sh"],
+        deps = ["@bazel_tools//tools/bash/runfiles"],
+        # data = [
+        #     name + "_fg",
+        #     foreign_cc_target
+        # ],
+        **kwargs
+    )
+
+    native.genrule(
+        name = "blob5",
+        srcs = ["@rules_foreign_cc//foreign_cc/private:runnable_bin_wrapper.sh", name + "_fg"],
+        outs = ["blob5.sh"],
+        cmd = "sed s%BIN%{}%g $(location @rules_foreign_cc//foreign_cc/private:runnable_bin_wrapper.sh) > $@".format(full_label(binary)),
+        executable=True,
+        # cmd = "ls $(location {}) > $@".format(name + "_fg")
+    )
+
+    native.sh_binary(
+        name = "blob6",
+        srcs = ["blob5"],
+        deps = ["@bazel_tools//tools/bash/runfiles"],
+        data = [
+            name + "_fg",
+            foreign_cc_target
+        ],
+        **kwargs
+    )
+
     # Instead do this approach - https://stackoverflow.com/questions/53472993/how-do-i-make-a-bazel-sh-binary-target-depend-on-other-binary-targets/53481508#53481508
+
+
+#https://stackoverflow.com/questions/47068989/how-to-compute-the-bazel-workspace-name-in-a-macro
+def full_label(label):
+    if native.repository_name() != "@":
+        return native.repository_name() + '/' + native.package_name() + '/' + label
+    else:
+        return native.repository_name() + '//' + native.package_name() + ':' + label
+
+
+# binary is "select()", so cant use that
+# Perhaps best to make a custom rule that is basically a reimplementation of genrule except it runs a binary and sets the correct environment variables to include the .so/dll/dylibs
+
+
+# actually using "$(rootpath)" in blob2 
+
+
+def test(label):
+    print(Label(full_label(label)).workspace_root)
+    return label
+
+
+# Currently, "bazel run :blob3 --enable_runfiles" works, i just need to somehow get the workspace name programatically

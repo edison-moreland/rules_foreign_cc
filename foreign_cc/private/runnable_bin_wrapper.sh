@@ -1,5 +1,18 @@
 #!/bin/bash
 
+RUNFILES_LIB_DEBUG=1
+
+# --- begin runfiles.bash initialization v2 ---
+# Copy-pasted from the Bazel Bash runfiles library v2. (@bazel_tools//tools/bash/runfiles)
+set -uo pipefail; f=bazel_tools/tools/bash/runfiles/runfiles.bash
+source "${RUNFILES_DIR:-/dev/null}/$f" 2>/dev/null || \
+source "$(grep -sm1 "^$f " "${RUNFILES_MANIFEST_FILE:-/dev/null}" | cut -f2- -d' ')" 2>/dev/null || \
+source "$0.runfiles/$f" 2>/dev/null || \
+source "$(grep -sm1 "^$f " "$0.runfiles_manifest" | cut -f2- -d' ')" 2>/dev/null || \
+source "$(grep -sm1 "^$f " "$0.exe.runfiles_manifest" | cut -f2- -d' ')" 2>/dev/null || \
+{ echo>&2 "ERROR: cannot find $f"; exit 1; }; f=; set -e
+# --- end runfiles.bash initialization v2 ---
+
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     SHARED_LIB_SUFFIX=".so"
     LIB_PATH_VAR=LD_LIBRARY_PATH
@@ -22,7 +35,13 @@ for dir in "${!SHARED_LIBS_DIRS_ARRAY[@]}"; do
     export ${LIB_PATH_VAR}="${!LIB_PATH_VAR}":"$dir"
 done
 
-BIN $@
+echo "location is"
+ls $(rlocation "rules_foreign_cc_examples/BIN")
+
+# BIN $@
+#ls
+
+#cat ../MANIFEST
 
 
 # have to --enable_runfiles
