@@ -1,5 +1,7 @@
 load("@rules_foreign_cc//foreign_cc:defs.bzl", "jacks_rule")
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
+load("@rules_foreign_cc//foreign_cc:defs.bzl", "cmake", "runnable_bin")
+
 
 cc_binary(
     name = "test_bin",
@@ -55,16 +57,25 @@ test_suite(
 )
 
 
-filegroup(
-    name = "openssl_fg",
-    srcs = ["@openssl//:openssl"],
-    output_group = "openssl.exe",
-)
+# filegroup(
+#     name = "openssl_fg",
+#     srcs = ["@openssl//:openssl"],
+#     output_group = "openssl",
+# )
 
-genrule(
-    name = "blob",
-    srcs=[":openssl_fg"],
-    outs=["blob.txt"],
-    cmd="$(locations :openssl_fg) help > $@",
-    executable=True
-)
+# genrule(
+#     name = "blob",
+#     srcs=[":openssl_fg"],
+#     outs=["blob.txt"],
+#     cmd="$(locations :openssl_fg) help > $@",
+#     executable=True
+# )
+
+# runnable_bin(
+#     name = "runnable_openssl",
+#     binary = select({
+#         "//:windows": "openssl.exe",
+#         "//conditions:default": "openssl",
+#     }),
+#     foreign_cc_target = "@openssl//:openssl"
+# )

@@ -93,7 +93,7 @@ def runnable_binary(name, binary, foreign_cc_target, **kwargs):
         name = "blob2",
         srcs = ["@rules_foreign_cc//foreign_cc/private:runnable_bin_wrapper.sh", name + "_fg"],
         outs = ["blob.sh"],
-        cmd = "sed s@BIN@$(rootpath {})@g $(location @rules_foreign_cc//foreign_cc/private:runnable_bin_wrapper.sh) > $@".format(name + "_fg"),
+        cmd = "sed s@BIN@$(rootpath {})@g $(location @rules_foreign_cc//foreign_cc/private:runnable_bin_wrapper.sh) > $@".format(full_label(name + "_fg")),
         executable=True,
         # cmd = "ls $(location {}) > $@".format(name + "_fg")
     )
@@ -130,25 +130,25 @@ def runnable_binary(name, binary, foreign_cc_target, **kwargs):
         **kwargs
     )
 
-    native.genrule(
-        name = "blob5",
-        srcs = ["@rules_foreign_cc//foreign_cc/private:runnable_bin_wrapper.sh", name + "_fg"],
-        outs = ["blob5.sh"],
-        cmd = "sed s%BIN%{}%g $(location @rules_foreign_cc//foreign_cc/private:runnable_bin_wrapper.sh) > $@".format(full_label(binary)),
-        executable=True,
-        # cmd = "ls $(location {}) > $@".format(name + "_fg")
-    )
+    # native.genrule(
+    #     name = "blob5",
+    #     srcs = ["@rules_foreign_cc//foreign_cc/private:runnable_bin_wrapper.sh", name + "_fg"],
+    #     outs = ["blob5.sh"],
+    #     cmd = "sed s%BIN%{}%g $(location @rules_foreign_cc//foreign_cc/private:runnable_bin_wrapper.sh) > $@".format(full_label(binary)),
+    #     executable=True,
+    #     # cmd = "ls $(location {}) > $@".format(name + "_fg")
+    # )
 
-    native.sh_binary(
-        name = "blob6",
-        srcs = ["blob5"],
-        deps = ["@bazel_tools//tools/bash/runfiles"],
-        data = [
-            name + "_fg",
-            foreign_cc_target
-        ],
-        **kwargs
-    )
+    # native.sh_binary(
+    #     name = "blob6",
+    #     srcs = ["blob5"],
+    #     deps = ["@bazel_tools//tools/bash/runfiles"],
+    #     data = [
+    #         name + "_fg",
+    #         foreign_cc_target
+    #     ],
+    #     **kwargs
+    # )
 
     # Instead do this approach - https://stackoverflow.com/questions/53472993/how-do-i-make-a-bazel-sh-binary-target-depend-on-other-binary-targets/53481508#53481508
 
@@ -156,8 +156,10 @@ def runnable_binary(name, binary, foreign_cc_target, **kwargs):
 #https://stackoverflow.com/questions/47068989/how-to-compute-the-bazel-workspace-name-in-a-macro
 def full_label(label):
     if native.repository_name() != "@":
-        return native.repository_name() + '/' + native.package_name() + '/' + label
+        print("full label is a ", native.repository_name() + '//' + native.package_name() + ':' + label)
+        return native.repository_name() + '//' + native.package_name() + ':' + label
     else:
+        print("full label is b ", native.repository_name() + '//' + native.package_name() + ':' + label)
         return native.repository_name() + '//' + native.package_name() + ':' + label
 
 

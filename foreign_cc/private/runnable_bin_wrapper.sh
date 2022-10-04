@@ -36,7 +36,8 @@ for dir in "${!SHARED_LIBS_DIRS_ARRAY[@]}"; do
 done
 
 echo "location is"
-ls $(rlocation "rules_foreign_cc_examples/BIN")
+EXE=BIN
+$(rlocation "${EXE#external/}")
 
 # BIN $@
 #ls

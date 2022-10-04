@@ -9,6 +9,9 @@ load("@rules_foreign_cc//foreign_cc:defs.bzl", "configure_make", "configure_make
 
 # Read https://wiki.openssl.org/index.php/Compilation_and_Installation
 
+package(default_visibility = ["//visibility:public"])
+
+
 filegroup(
     name = "all_srcs",
     srcs = glob(
