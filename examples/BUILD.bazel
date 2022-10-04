@@ -53,3 +53,18 @@ test_suite(
     tags = ["manual"],
     tests = ["@rules_foreign_cc_examples_third_party//:windows_tests"],
 )
+
+
+filegroup(
+    name = "openssl_fg",
+    srcs = ["@openssl//:openssl"],
+    output_group = "openssl.exe",
+)
+
+genrule(
+    name = "blob",
+    srcs=[":openssl_fg"],
+    outs=["blob.txt"],
+    cmd="$(locations :openssl_fg) help > $@",
+    executable=True
+)
