@@ -14,7 +14,7 @@ source "$(grep -sm1 "^$f " "$0.exe.runfiles_manifest" | cut -f2- -d' ')" 2>/dev/
 # --- end runfiles.bash initialization v2 ---
 
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-    SHARED_LIB_SUFFIX=".so"
+    SHARED_LIB_SUFFIX=".so*"
     LIB_PATH_VAR=LD_LIBRARY_PATH
 elif [[ "$OSTYPE" == "darwin"* ]]; then
     SHARED_LIB_SUFFIX=".dylib"
@@ -31,11 +31,12 @@ for lib in "${SHARED_LIBS_ARRAY[@]}"; do
     SHARED_LIBS_DIRS_ARRAY[$(dirname $(realpath $lib))]=1
 done
 
+set +u
 for dir in "${!SHARED_LIBS_DIRS_ARRAY[@]}"; do
     export ${LIB_PATH_VAR}="${!LIB_PATH_VAR}":"$dir"
 done
+set -u
 
-echo "location is"
 EXE=BIN
 $(rlocation "${EXE#external/}")
 
