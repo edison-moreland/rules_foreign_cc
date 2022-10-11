@@ -36,7 +36,7 @@ def built_toolchains(cmake_version, make_version, ninja_version, pkgconfig_versi
     _cmake_toolchain(cmake_version, register_toolchains)
     _make_toolchain(make_version, register_toolchains)
     _ninja_toolchain(ninja_version, register_toolchains)
-    # _pkgconfig_toolchain(pkgconfig_version, register_toolchains)
+    _pkgconfig_toolchain(pkgconfig_version, register_toolchains)
 
 def _cmake_toolchain(version, register_toolchains):
     if register_toolchains:

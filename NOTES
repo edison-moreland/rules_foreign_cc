@@ -16,3 +16,8 @@ What can I do instead? I can write a sh_binary that sets the PATH variable when 
 
 make a macro that uses bin output group to make a sh_binary
 
+
+------
+
+can build pkgconfig with "bazel build toolchains:pkgconfig_tool"
+
