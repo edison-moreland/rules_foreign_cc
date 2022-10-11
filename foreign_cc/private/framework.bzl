@@ -404,7 +404,7 @@ def cc_external_rule_impl(ctx, attrs):
     inputs = _define_inputs(attrs)
     outputs = _define_outputs(ctx, attrs, lib_name)
     out_cc_info = _define_out_cc_info(ctx, attrs, inputs, outputs)
-    # print(out_cc_info)
+    print(out_cc_info.linking_context.linker_inputs.to_list()[1].libraries[0].dynamic_library)
 
     lib_header = "Bazel external C/C++ Rules. Building library '{}'".format(lib_name)
 
@@ -512,13 +512,16 @@ def cc_external_rule_impl(ctx, attrs):
 
     # Gather runfiles transitively as per the documentation in:
     # https://docs.bazel.build/versions/master/skylark/rules.html#runfiles
-    runfiles = ctx.runfiles(files = ctx.files.data + outputs.libraries.shared_libraries)
+    print(outputs.libraries.shared_libraries)
+    # TODO - get all shared libs from out_cc_info, example in line below
+    runfiles = ctx.runfiles(files = ctx.files.data + outputs.libraries.shared_libraries + [out_cc_info.linking_context.linker_inputs.to_list()[1].libraries[0].dynamic_library])
     for target in [ctx.attr.lib_source] + ctx.attr.deps + ctx.attr.data:
         runfiles = runfiles.merge(target[DefaultInfo].default_runfiles)
 
     # TODO: `additional_inputs` is deprecated, remove.
     for legacy in ctx.attr.additional_inputs:
         runfiles = runfiles.merge(legacy[DefaultInfo].default_runfiles)
+
 
     externally_built = ForeignCcArtifactInfo(
         gen_dir = installdir_copy.file,
@@ -862,6 +865,7 @@ def _define_inputs(attrs):
     # These variables are needed for correct C/C++ providers constraction,
     # they should contain all libraries and include directories.
     cc_info_merged = cc_common.merge_cc_infos(cc_infos = cc_infos)
+    print("cc_info_merged is ", cc_info_merged.linking_context)
     return InputFiles(
         headers = bazel_headers,
         include_dirs = bazel_system_includes,
