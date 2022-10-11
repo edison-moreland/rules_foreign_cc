@@ -19,5 +19,5 @@ make a macro that uses bin output group to make a sh_binary
 
 ------
 
-can build pkgconfig with "bazel build toolchains:pkgconfig_tool"
+in the examples folder, run "bazel run @rules_foreign_cc//toolchains:pkgconfig_tool --enable_runfiles"
 

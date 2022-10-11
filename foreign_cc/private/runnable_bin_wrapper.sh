@@ -38,6 +38,7 @@ done
 set -u
 
 EXE=BIN
+ls 
 $(rlocation "${EXE#external/}")
 
 # BIN $@

@@ -1,6 +1,6 @@
 """ Rule for building pkg-config from sources. """
 
-load("//foreign_cc:defs.bzl", "make_variant")
+load("//foreign_cc:defs.bzl", "make_variant", "runnable_binary")
 
 def pkgconfig_tool(name, srcs, **kwargs):
     tags = ["manual"] + kwargs.pop("tags", [])
@@ -37,6 +37,15 @@ def pkgconfig_tool(name, srcs, **kwargs):
         **kwargs
     )
 
+    runnable_binary(
+        name = name,
+        binary = select({
+            "@platforms//os:windows": "pkg-config.exe",
+            "//conditions:default": "pkg-config",
+        }),
+        foreign_cc_target = "{}.build".format(name)
+    )
+
     # native.filegroup(
     #     name = name,
     #     srcs = ["{}.build".format(name)],
@@ -44,18 +53,18 @@ def pkgconfig_tool(name, srcs, **kwargs):
     #     tags = tags,
     # )
 
-    native.filegroup(
-        name = name + "_bin",
-        srcs = ["{}.build".format(name)],
-        output_group = select({
-            "@platforms//os:windows": "pkg-config.exe",
-            "//conditions:default": "pkg-config",
-        }),
-        tags = tags,
-    )
+    # native.filegroup(
+    #     name = name + "_bin",
+    #     srcs = ["{}.build".format(name)],
+    #     output_group = select({
+    #         "@platforms//os:windows": "pkg-config.exe",
+    #         "//conditions:default": "pkg-config",
+    #     }),
+    #     tags = tags,
+    # )
 
-    native.sh_binary(
-        name = name,
-        srcs = ["@rules_foreign_cc//foreign_cc/built_tools:pkgconfig_wrapper.sh"],
-        data = ["{}.build".format(name), name + "_bin"],
-    )
+    # native.sh_binary(
+    #     name = name,
+    #     srcs = ["@rules_foreign_cc//foreign_cc/built_tools:pkgconfig_wrapper.sh"],
+    #     data = ["{}.build".format(name), name + "_bin"],
+    # )
