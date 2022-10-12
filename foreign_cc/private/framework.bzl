@@ -404,7 +404,6 @@ def cc_external_rule_impl(ctx, attrs):
     inputs = _define_inputs(attrs)
     outputs = _define_outputs(ctx, attrs, lib_name)
     out_cc_info = _define_out_cc_info(ctx, attrs, inputs, outputs)
-    print(out_cc_info.linking_context.linker_inputs.to_list()[1].libraries[0].dynamic_library)
 
     lib_header = "Bazel external C/C++ Rules. Building library '{}'".format(lib_name)
 
@@ -512,9 +511,18 @@ def cc_external_rule_impl(ctx, attrs):
 
     # Gather runfiles transitively as per the documentation in:
     # https://docs.bazel.build/versions/master/skylark/rules.html#runfiles
-    print(outputs.libraries.shared_libraries)
+    
+    # Include shared libraries of transitive dependencies in runfiles, facilitating the "runnable_binary" macro
+    transitive_shared_libraries = []
+    for linker_input in out_cc_info.linking_context.linker_inputs.to_list():
+        for lib in linker_input.libraries:
+            if lib.dynamic_library:
+                transitive_shared_libraries.append(lib.dynamic_library)
+    
+    print(transitive_shared_libraries)
+
     # TODO - get all shared libs from out_cc_info, example in line below
-    runfiles = ctx.runfiles(files = ctx.files.data + outputs.libraries.shared_libraries + [out_cc_info.linking_context.linker_inputs.to_list()[1].libraries[0].dynamic_library])
+    runfiles = ctx.runfiles(files = ctx.files.data + transitive_shared_libraries)
     for target in [ctx.attr.lib_source] + ctx.attr.deps + ctx.attr.data:
         runfiles = runfiles.merge(target[DefaultInfo].default_runfiles)
 
