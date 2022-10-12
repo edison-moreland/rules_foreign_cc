@@ -26,7 +26,8 @@ def pkgconfig_tool(name, srcs, **kwargs):
         out_shared_libs = [],
         deps=[
             "@glib_dev",
-            "@glib_src//:msvc_hdr"
+            "@glib_src//:msvc_hdr",
+            "@gettext_runtime"
         ],
         postfix_script = select({
             "@platforms//os:windows": "cp release/x64/pkg-config.exe $$INSTALLDIR$$/bin",

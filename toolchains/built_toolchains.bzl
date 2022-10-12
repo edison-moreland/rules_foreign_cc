@@ -529,6 +529,22 @@ exports_files(
             "https://download.gnome.org/binaries/win64/glib/2.26/glib_2.26.1-1_win64.zip"
         ],
     )
+
+    maybe(
+        http_archive,
+        name = "gettext_runtime",
+        build_file_content = '''
+cc_import(
+    name = "gettext_runtime",
+    shared_library = "bin/libintl-8.dll",
+    visibility = ["//visibility:public"],
+)
+        ''',
+        sha256 = "1f4269c0e021076d60a54e98da6f978a3195013f6de21674ba0edbc339c5b079",
+        urls = [
+            "https://download.gnome.org/binaries/win64/dependencies/gettext-runtime_0.18.1.1-2_win64.zip"
+        ],
+    )
     if version == "0.29.2":
         maybe(
             http_archive,
