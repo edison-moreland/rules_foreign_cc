@@ -284,11 +284,12 @@ native_tool_toolchain(
         "//conditions:default": {"PKG_CONFIG": "$(execpath :pkgconfig_tool)"},
     }),
     path = select({
-        "@platforms//os:windows": "$(execpath :pkgconfig_tool)",
-        "//conditions:default": "$(execpath :pkgconfig_tool)",
+        "@platforms//os:windows": "$(execpath :pkgconfig_tool)/bin/pkg-config.exe",
+        "//conditions:default": "$(execpath :pkgconfig_tool)/bin/pkg-config",
     }),
     target = ":pkgconfig_tool",
 )
+
 
 bzl_library(
     name = "bzl_srcs",
