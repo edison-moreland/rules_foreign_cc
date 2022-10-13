@@ -86,10 +86,7 @@ def pkgconfig_tool(name, srcs, **kwargs):
                 "CFG=release",
                 "GLIB_PREFIX=\"$$EXT_BUILD_ROOT/external/glib_dev\""
             ],
-        out_binaries = select({
-            "@platforms//os:windows": ["pkg-config.exe"],
-            "//conditions:default": ["pkg-config"],
-        }),
+        out_binaries = ["pkg-config.exe"],
         #TODO change make rule to set the appropriate NMAKE flag when using nmake, rather than cppflags="-I<include dir>"
         env = select({
             "@platforms//os:windows": {"INCLUDE": "$$EXT_BUILD_ROOT/external/glib_src"},
