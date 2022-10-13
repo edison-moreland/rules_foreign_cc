@@ -55,37 +55,23 @@ pkgconfig_tool_unix = rule(
 def pkgconfig_tool(name, srcs, **kwargs):
     tags = ["manual"] + kwargs.pop("tags", [])
 
-    # # Will need a genrule that uses the current cc toolchain to build pkgconfig. Make sure that when cross compiling that the host is used. Should be, as make_build.bzl refers to current toolchain
-    # configure_make(
-    #     name = "{}.build".format(name),
-    #     configure_options = ["--with-internal-glib"],
-    #     lib_name = "pkg-config",
-    #     lib_source = srcs,
-    #     out_binaries = ["pkg-config"],
-    #     tags = tags,
-    #     **kwargs
-    # )
+    native.config_setting(
+        name = "msvc_compiler",
+        flag_values = {
+            "@bazel_tools//tools/cpp:compiler": "msvc-cl",
+        },
+    )
 
-    # Use genrule rather than configure_make as configure_make depends on pkgconfig toolchain, causing cyclic dependency
-    # native.genrule(
-    #     name = name,
-    #     outs = ["pkg-config"],
-    #     executable = True,
-    #     srcs= [srcs],
-    #     cmd = """
-    #     ls $(rootpaths {}) | grep configure
-    #     export CC=$(CC)
-    #     ./configure --prefix=$$PWD/install  --with-internal-glib
-    #     $(MAKE)
-    #     $(MAKE) install
-    #     cp $$PWD/install/bin/pkg-config $@
-    #     """.format(srcs),
-    #     toolchains = ["@bazel_tools//tools/cpp:current_cc_toolchain", "@rules_foreign_cc//toolchains:current_make_toolchain"],
-    #     tags = tags,
-    #     **kwargs
-    # )
-    pkgconfig_tool_unix(
+    native.alias(
         name = name,
+        actual = select({
+            ":msvc_compiler": "{}_msvc".format(name),
+            "//conditions:default": "{}_default".format(name),
+        }),
+    )
+
+    pkgconfig_tool_unix(
+        name = "{}_default".format(name),
         srcs=srcs,
         tags=tags,
         **kwargs,
@@ -93,7 +79,7 @@ def pkgconfig_tool(name, srcs, **kwargs):
     )
 
     make_variant(
-        name = "{}.build_msvc".format(name),
+        name = "{}_msvc_build".format(name),
         lib_source = srcs,
         args = [
                 "-f Makefile.vc",
@@ -125,35 +111,9 @@ def pkgconfig_tool(name, srcs, **kwargs):
         **kwargs
     )
 
-    # runnable_binary(
-    #     name = name,
-    #     binary = select({
-    #         "@platforms//os:windows": "pkg-config.exe",
-    #         "//conditions:default": "pkg-config",
-    #     }),
-    #     foreign_cc_target = "{}.build".format(name)
-    #     # TODO select on msvc. actually only need this on windows
-    # )
+    runnable_binary(
+        name = "{}_msvc".format(name),
+        binary = "pkg-config.exe",
+        foreign_cc_target = "{}_msvc_build".format(name)
+    )
 
-    # native.filegroup(
-    #     name = name,
-    #     srcs = ["{}.build".format(name)],
-    #     output_group = "gen_dir",
-    #     tags = tags,
-    # )
-
-    # native.filegroup(
-    #     name = name + "_bin",
-    #     srcs = ["{}.build".format(name)],
-    #     output_group = select({
-    #         "@platforms//os:windows": "pkg-config.exe",
-    #         "//conditions:default": "pkg-config",
-    #     }),
-    #     tags = tags,
-    # )
-
-    # native.sh_binary(
-    #     name = name,
-    #     srcs = ["@rules_foreign_cc//foreign_cc/built_tools:pkgconfig_wrapper.sh"],
-    #     data = ["{}.build".format(name), name + "_bin"],
-    # )
