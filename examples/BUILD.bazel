@@ -1,6 +1,5 @@
-load("@rules_foreign_cc//foreign_cc:defs.bzl", "jacks_rule")
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
-load("@rules_foreign_cc//foreign_cc:defs.bzl", "cmake", "runnable_bin")
+load("@rules_foreign_cc//foreign_cc:defs.bzl", "cmake")
 
 
 cc_binary(
@@ -9,10 +8,7 @@ cc_binary(
     srcs = ["main.cpp"]
 )
 
-jacks_rule(
-    name = "test",
-    target="@rules_foreign_cc//toolchains:pkgconfig_tool.build"
-)
+
 
 # TODO: This should not be necessary but there appears to be some inconsistent
 # behavior with the use of `constraint_value`s in `select` statements. A support
@@ -56,6 +52,12 @@ test_suite(
     tests = ["@rules_foreign_cc_examples_third_party//:windows_tests"],
 )
 
+genrule(
+    name = "blob",
+    srcs=["@rules_foreign_cc//toolchains:pkgconfig_tool"],
+    outs=["blob.txt"],
+    cmd="ls $(location @rules_foreign_cc//toolchains:pkgconfig_tool)",
+)
 
 # filegroup(
 #     name = "openssl_fg",

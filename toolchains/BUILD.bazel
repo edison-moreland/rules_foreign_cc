@@ -280,7 +280,7 @@ pkgconfig_tool(
 native_tool_toolchain(
     name = "built_pkgconfig",
     env = select({
-        "@platforms//os:windows": {"PKG_CONFIG": "$(execpath :pkgconfig_tool)/bin/pkg-config.exe"},
+        "@platforms//os:windows": {"PKG_CONFIG": "$(execpath :pkgconfig_tool)"},
         "//conditions:default": {"PKG_CONFIG": "$(execpath :pkgconfig_tool)/bin/pkg-config"},
     }),
     path = select({
