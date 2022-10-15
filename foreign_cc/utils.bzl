@@ -48,6 +48,8 @@ def runnable_binary(name, binary, foreign_cc_target, **kwargs):
         **kwargs
     )
 
+    # sh_binary provides more than one output file, preventing the use of make variable expansion such as "location"; the plural "locations" must be used instead
+    # Wrap the sh_binary in a skylib native_binary to faciliate single output and usage of singular make variable expansion, i.e. "location"
     native_binary(
         name = name,
         src = name + "_sh",
