@@ -21,3 +21,5 @@ make a macro that uses bin output group to make a sh_binary
 
 in the examples folder, run "bazel run @rules_foreign_cc//toolchains:pkgconfig_tool --enable_runfiles"
 
+why is running the above causing infinite pkg-configs to be run?
+Why when building openssl is pkgconfig not first built?

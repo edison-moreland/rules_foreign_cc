@@ -54,16 +54,11 @@ def runnable_binary(name, binary, foreign_cc_target, **kwargs):
         name = name,
         src = name + "_sh",
         out = name + ".exe",
+        # data = [name + "_sh"],
         **kwargs
     )
 
-    native.genrule(
-        name = "blob",
-        srcs=[name],
-        outs=["blob.txt"],
-        cmd="ls $(locations {})".format(name),
-        executable=True
-    )
+    
 
 
 
@@ -100,47 +95,7 @@ def runnable_binary(name, binary, foreign_cc_target, **kwargs):
 #         **kwargs
 #     )
 
-    # Seems that "bazel run" on windows will try to run the blob.sh output as is and fail to do so. Instead, create a sh_binary from blob.sh generated here
-    native.genrule(
-        name = "blob2",
-        srcs = ["@rules_foreign_cc//foreign_cc/private:runnable_bin_wrapper.sh", name + "_fg"],
-        outs = ["blob.sh"],
-        cmd = "sed s@BIN@$(rootpath {})@g $(location @rules_foreign_cc//foreign_cc/private:runnable_bin_wrapper.sh) > $@".format(full_label(name + "_fg")),
-        executable=True,
-        # cmd = "ls $(location {}) > $@".format(name + "_fg")
-    )
-
-    # But now the blob.sh has the path to the exe to run in the build tree rather than in the sh_bin
-    native.sh_binary(
-        name = "blob3",
-        deps = ["@bazel_tools//tools/bash/runfiles"],
-        srcs = ["blob2"],
-        data = [
-            name + "_fg",
-            foreign_cc_target
-        ],
-        **kwargs
-    )
-
-    native.genrule(
-        name = "blob3_2",
-        tools = ["blob3"],
-        outs = ["blob3_2.sh"],
-        cmd = "$(location blob3)",
-        executable=True,
-        # cmd = "ls $(location {}) > $@".format(name + "_fg")
-    )    
-
-    native.sh_binary(
-        name = "blob4",
-        srcs = ["@rules_foreign_cc//foreign_cc/private:runnable_bin_wrapper.sh"],
-        deps = ["@bazel_tools//tools/bash/runfiles"],
-        # data = [
-        #     name + "_fg",
-        #     foreign_cc_target
-        # ],
-        **kwargs
-    )
+    
 
     # native.genrule(
     #     name = "blob5",
