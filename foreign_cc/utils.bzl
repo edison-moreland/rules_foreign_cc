@@ -1,5 +1,7 @@
 """ This file contains useful utilities """
 load("@bazel_skylib//rules:native_binary.bzl", "native_binary")
+load("@bazel_skylib//rules:copy_file.bzl", "copy_file")
+
 
 def _full_label(label):
     return native.repository_name() + "//" + native.package_name() + ":" + label
@@ -53,9 +55,18 @@ def runnable_binary(name, binary, foreign_cc_target, **kwargs):
     native_binary(
         name = name,
         src = name + "_sh",
-        out = name + ".exe",
-        # data = [name + "_sh"],
+        out = name + "_out.exe",
+        data = [name + "_wrapper_copy"],
         **kwargs
+    )
+
+    # TODO make sure it works with windows_enable_symlinks startup option. also set msys winsymblinks action env
+    # This is necessary because it seems that sh_binary creates an .exe that must have the script with same name without exe extension, otherwise it fails. As we are using native_binary above we need to copy
+    copy_file(
+        name = name + "_wrapper_copy",
+        src = name + "_wrapper",
+        out = name + "_out"
+
     )
 
     
