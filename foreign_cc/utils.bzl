@@ -1,4 +1,5 @@
 """ This file contains useful utilities """
+load("@bazel_skylib//rules:native_binary.bzl", "native_binary")
 
 def _full_label(label):
     return native.repository_name() + "//" + native.package_name() + ":" + label
@@ -37,13 +38,20 @@ def runnable_binary(name, binary, foreign_cc_target, **kwargs):
     )
 
     native.sh_binary(
-        name = name,
+        name = name + "_sh",
         deps = ["@bazel_tools//tools/bash/runfiles"],
         srcs = [name + "_wrapper"],
         data = [
             name + "_fg",
             foreign_cc_target,
         ],
+        **kwargs
+    )
+
+    native_binary(
+        name = name,
+        src = name + "_sh",
+        out = name + ".exe",
         **kwargs
     )
 
@@ -54,6 +62,8 @@ def runnable_binary(name, binary, foreign_cc_target, **kwargs):
         cmd="ls $(locations {})".format(name),
         executable=True
     )
+
+
 
 #     native.genrule(
 #         name = name,
