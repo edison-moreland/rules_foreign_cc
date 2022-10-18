@@ -1,1 +1,4 @@
 startup --output_user_root=C:/b
+build --override_repository=bazel_skylib=C:\\msys64\\home\\jheaffey\\git\\bazel-skylib
+
+build --enable_runfiles

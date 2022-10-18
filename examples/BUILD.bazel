@@ -54,9 +54,10 @@ test_suite(
 
 genrule(
     name = "blob",
+    # tools=["@rules_foreign_cc//toolchains:pkgconfig_tool"],
     srcs=["@rules_foreign_cc//toolchains:pkgconfig_tool"],
     outs=["blob.txt"],
-    cmd="ls $(location @rules_foreign_cc//toolchains:pkgconfig_tool)",
+    cmd="ls $(locations @rules_foreign_cc//toolchains:pkgconfig_tool)",
 )
 
 # filegroup(

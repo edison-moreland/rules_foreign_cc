@@ -478,6 +478,7 @@ def cc_external_rule_impl(ctx, attrs):
     # TODO: `additional_tools` is deprecated, remove.
     legacy_tools = ctx.files.additional_tools + ctx.files.tools_deps
 
+
     # The use of `run_shell` here is intended to ensure bash is correctly setup on windows
     # environments. This should not be replaced with `run` until a cross platform implementation
     # is found that guarantees bash exists or appropriately errors out.
@@ -488,6 +489,10 @@ def cc_external_rule_impl(ctx, attrs):
     for data in data_dependencies:
         tool_runfiles += data[DefaultInfo].default_runfiles.files.to_list()
 
+
+    # print("built data is ", ctx.files.build_data)
+    #<generated file external/rules_foreign_cc/toolchains/pkgconfig_tool_msvc_out.exe>
+    print("declared inputs is ", inputs.declared_inputs[-1])
     ctx.actions.run_shell(
         mnemonic = "Cc" + attrs.configure_name.capitalize() + "MakeRule",
         inputs = depset(inputs.declared_inputs),
@@ -499,7 +504,7 @@ def cc_external_rule_impl(ctx, attrs):
             legacy_tools +
             cc_toolchain.all_files.to_list() +
             tool_runfiles +
-            [data[DefaultInfo].files_to_run for data in data_dependencies],
+            [data[DefaultInfo].files_to_run for data in data_dependencies] + [ inputs.declared_inputs[-1]],
         command = wrapped_outputs.wrapper_script_file.path,
         execution_requirements = execution_requirements,
         use_default_shell_env = True,
@@ -519,7 +524,7 @@ def cc_external_rule_impl(ctx, attrs):
             if lib.dynamic_library:
                 transitive_shared_libraries.append(lib.dynamic_library)
     
-    print(transitive_shared_libraries)
+    #print(transitive_shared_libraries)
 
     # TODO - get all shared libs from out_cc_info, example in line below
     runfiles = ctx.runfiles(files = ctx.files.data + transitive_shared_libraries)
@@ -545,7 +550,7 @@ def cc_external_rule_impl(ctx, attrs):
         wrapped_outputs.wrapper_script_file,
     ]
     output_groups[attrs.configure_name + "_logs"] = wrapped_files
-    print("runfiles are  - ", runfiles.files)
+    #print("runfiles are  - ", runfiles.files)
     return [
         DefaultInfo(
             files = depset(direct = rule_outputs),
@@ -873,7 +878,8 @@ def _define_inputs(attrs):
     # These variables are needed for correct C/C++ providers constraction,
     # they should contain all libraries and include directories.
     cc_info_merged = cc_common.merge_cc_infos(cc_infos = cc_infos)
-    print("cc_info_merged is ", cc_info_merged.linking_context)
+    # print("tool files is", tools_files)
+    #print("cc_info_merged is ", cc_info_merged.linking_context)
     return InputFiles(
         headers = bazel_headers,
         include_dirs = bazel_system_includes,

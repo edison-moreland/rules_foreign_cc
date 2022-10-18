@@ -23,3 +23,14 @@ in the examples folder, run "bazel run @rules_foreign_cc//toolchains:pkgconfig_t
 
 why is running the above causing infinite pkg-configs to be run?
 Why when building openssl is pkgconfig not first built?
+
+----
+Get examples :blob invoking pkg config build
+
+Try reverting pkgconfg_tool to be the sh_binary
+
+Maybe native_binary doesn’t set transitive runfiles properly
+Check runnable bin works on Linux ie runnable OpenSSL
+
+----
+instead of skylib, wrap sh_binary in a genrule that produces a bat script, this is required for windows only

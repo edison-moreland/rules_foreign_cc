@@ -47,6 +47,7 @@ def runnable_binary(name, binary, foreign_cc_target, **kwargs):
             name + "_fg",
             foreign_cc_target,
         ],
+        tags = tags + ["manual"],
         **kwargs
     )
 
@@ -56,21 +57,57 @@ def runnable_binary(name, binary, foreign_cc_target, **kwargs):
         name = name,
         src = name + "_sh",
         out = name + "_out.exe",
-        data = [name + "_wrapper_copy"],
+        data = [name + "_wrapper_copy", name + "_fg", foreign_cc_target,],
+        tags = tags,
         **kwargs
     )
 
     # TODO make sure it works with windows_enable_symlinks startup option. also set msys winsymblinks action env
-    # This is necessary because it seems that sh_binary creates an .exe that must have the script with same name without exe extension, otherwise it fails. As we are using native_binary above we need to copy
+    # This is necessary because it seems that on windows sh_binary creates an .exe that must have the script with same name without exe extension, otherwise it fails. As we are using native_binary above we need to copy
     copy_file(
         name = name + "_wrapper_copy",
         src = name + "_wrapper",
-        out = name + "_out"
-
+        out = name + "_out",
+        tags = tags + ["manual"],
+        **kwargs
     )
 
-    
+    # native.genrule(
+    #     name = name + "_bat",
+    #     srcs = [name + "_sh"],
+    #     outs = [name + ".bat"],
+    #     executable = True,
+    #     # cmd_bat = "cmd /c $(locations :{}_sh)".format(name)
+    #     # cmd_bat = "echo $(locations :{}_sh)".format(name)
+    #     # cmd_bat="""
+    #     # setlocal EnableDelayedExpansion
+    #     # for %%f in ($(locations :{}_sh)) do (
+    #     #     echo %%f
+    #     # )
+    #     # """.format(name)
+    #     cmd="""
+    #     files=($(locations :{}_sh))
+    #     EXE=
+    #     for f in $${{files[@]}}; do
+    #         if [[ $$f == *.exe ]]
+    #         then
+    #             EXE=$$f
+    #         fi
+    #     done
 
+    #     echo "cmd /c $${{EXE////\\\\\\}}" > $@
+    #     """.format(name),
+    # )
+
+    # native.filegroup(
+    #     name = name,
+    #     srcs = [name + "_bat"],
+    #     data = [name + "_sh"],
+    # )
+
+    # can use shell to create a batch file
+
+#${A////\\}
 
 
 #     native.genrule(
@@ -134,10 +171,10 @@ def runnable_binary(name, binary, foreign_cc_target, **kwargs):
 #https://stackoverflow.com/questions/47068989/how-to-compute-the-bazel-workspace-name-in-a-macro
 def full_label(label):
     if native.repository_name() != "@":
-        print("full label is a ", native.repository_name() + '//' + native.package_name() + ':' + label)
+        #print("full label is a ", native.repository_name() + '//' + native.package_name() + ':' + label)
         return native.repository_name() + '//' + native.package_name() + ':' + label
     else:
-        print("full label is b ", native.repository_name() + '//' + native.package_name() + ':' + label)
+        #print("full label is b ", native.repository_name() + '//' + native.package_name() + ':' + label)
         return native.repository_name() + '//' + native.package_name() + ':' + label
 
 
@@ -149,7 +186,7 @@ def full_label(label):
 
 
 def test(label):
-    print(Label(full_label(label)).workspace_root)
+    #print(Label(full_label(label)).workspace_root)
     return label
 
 
