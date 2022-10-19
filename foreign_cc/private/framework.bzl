@@ -492,7 +492,7 @@ def cc_external_rule_impl(ctx, attrs):
 
     # print("built data is ", ctx.files.build_data)
     #<generated file external/rules_foreign_cc/toolchains/pkgconfig_tool_msvc_out.exe>
-    print("declared inputs is ", inputs.declared_inputs[-1])
+    # print("declared inputs is ", inputs.declared_inputs[-1])
     ctx.actions.run_shell(
         mnemonic = "Cc" + attrs.configure_name.capitalize() + "MakeRule",
         inputs = depset(inputs.declared_inputs),

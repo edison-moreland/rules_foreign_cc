@@ -24,6 +24,7 @@ def preinstalled_toolchains():
 
 def _current_toolchain_impl(ctx):
     toolchain = ctx.toolchains[ctx.attr._toolchain]
+    print("toolchain is  ", toolchain)
 
     if toolchain.data.target:
         return [

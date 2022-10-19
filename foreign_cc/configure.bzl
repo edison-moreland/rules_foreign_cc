@@ -31,7 +31,7 @@ def _configure_make(ctx):
     #struct(data_runfiles = <unknown object com.google.devtools.build.lib.analysis.Runfiles>, default_runfiles = <unknown object com.google.devtools.build.lib.analysis.Runfiles>, files = depset([<generated file external/rules_foreign_cc/toolchains/pkgconfig_tool.build_/bin/pkg-config.exe>]), files_to_run = <unknown object com.google.devtools.build.lib.analysis.FilesToRunProvider>)
 
     tools_deps = ctx.attr.tools_deps + make_data.deps + pkg_config_data.deps
-    print("tool deps is", tools_deps)
+    # print("tool deps is", tools_deps)
 
     if ctx.attr.autogen and not ctx.attr.configure_in_place:
         fail("`autogen` requires `configure_in_place = True`. Please update {}".format(

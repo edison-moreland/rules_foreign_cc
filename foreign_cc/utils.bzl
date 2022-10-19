@@ -29,6 +29,7 @@ def runnable_binary(name, binary, foreign_cc_target, **kwargs):
         srcs = [foreign_cc_target],
         tags = tags + ["manual"],
         output_group = binary,
+        visibility = ["//visibility:public"],
     )
 
     native.genrule(
@@ -37,40 +38,72 @@ def runnable_binary(name, binary, foreign_cc_target, **kwargs):
         outs = [name + "_wrapper.sh"],
         cmd = "sed s@BIN@$(rootpath {})@g $(location @rules_foreign_cc//foreign_cc/private:runnable_binary_wrapper.sh) > $@".format(_full_label(name + "_fg")),
         tags = tags + ["manual"],
+        visibility = ["//visibility:public"],
+    )
+
+    native.filegroup(
+        name = "workaround_fg",
+        srcs = [name + "_fg", foreign_cc_target, name + "_wrapper"],
+        tags = tags + ["manual"],
+        visibility = ["//visibility:public"],
+    )
+    native.sh_library(
+        name = "workaround",
+        data = [name + "_wrapper",name + "_fg", foreign_cc_target, ":workaround_fg"],
+        visibility = ["//visibility:public"],
     )
 
     native.sh_binary(
         name = name + "_sh",
-        deps = ["@bazel_tools//tools/bash/runfiles"],
+        deps = ["@bazel_tools//tools/bash/runfiles", ":workaround", name + "_wrapper"],
+        data = [":workaround_fg", name + "_fg", "workaround"],
         srcs = [name + "_wrapper"],
-        data = [
-            name + "_fg",
-            foreign_cc_target,
-        ],
         tags = tags + ["manual"],
         **kwargs
     )
 
+    native.genrule(
+        name = name + "_genrule",
+        srcs = [name + "_sh"],
+        outs = [name + "out.sh"],
+        cmd = "echo hi > $@",
+        tags = tags + ["manual"],
+        executable = True,
+        visibility = ["//visibility:public"],
+    )
+
+    # native.genrule(
+    #     name = name,
+    #     srcs = [name + "_genrule"],
+    #     outs = [name + "out2.sh"],
+    #     cmd = "echo hi > $@",
+    #     tags = tags + ["manual"],
+    #     visibility = ["//visibility:public"],
+    # )    
+
+
     # sh_binary provides more than one output file, preventing the use of make variable expansion such as "location"; the plural "locations" must be used instead
-    # Wrap the sh_binary in a skylib native_binary to faciliate single output and usage of singular make variable expansion, i.e. "location"
+    # # Wrap the sh_binary in a skylib native_binary to faciliate single output and usage of singular make variable expansion, i.e. "location"
     native_binary(
         name = name,
-        src = name + "_sh",
+        # Why does the below work but not name + "_sh"?
+        src = name + "_genrule",
+        #src = name + "_sh",
         out = name + "_out.exe",
-        data = [name + "_wrapper_copy", name + "_fg", foreign_cc_target,],
+        data = [name + "_wrapper_copy", ":workaround", name + "_wrapper", ":workaround_fg", foreign_cc_target,  name + "_genrule"],
         tags = tags,
         **kwargs
     )
 
-    # TODO make sure it works with windows_enable_symlinks startup option. also set msys winsymblinks action env
-    # This is necessary because it seems that on windows sh_binary creates an .exe that must have the script with same name without exe extension, otherwise it fails. As we are using native_binary above we need to copy
-    copy_file(
-        name = name + "_wrapper_copy",
-        src = name + "_wrapper",
-        out = name + "_out",
-        tags = tags + ["manual"],
-        **kwargs
-    )
+    # # TODO make sure it works with windows_enable_symlinks startup option. also set msys winsymblinks action env
+    # # This is necessary because it seems that on windows sh_binary creates an .exe that must have the script with same name without exe extension, otherwise it fails. As we are using native_binary above we need to copy
+    # copy_file(
+    #     name = name + "_wrapper_copy",
+    #     src = name + "_wrapper",
+    #     out = name + "_out",
+    #     tags = tags + ["manual"],
+    #     **kwargs
+    # )
 
     # native.genrule(
     #     name = name + "_bat",
