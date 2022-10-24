@@ -36,6 +36,7 @@ Check runnable bin works on Linux ie runnable OpenSSL
 instead of skylib, wrap sh_binary in a genrule that produces a bat script, this is required for windows only
 
 Try filegroup workaround - https://github.com/bazelbuild/bazel/issues/12348
+See if this PR fixes the issue - https://github.com/bazelbuild/bazel/pull/15052
 Try building log4cxx (which required pkg config) in a docker container with no pkg config
 
 if cant get it working, could use this - https://sourceforge.net/projects/pkgconfiglite/
