@@ -26,9 +26,24 @@ def _native_tool_toolchain_impl(ctx):
     if not ctx.attr.path and not ctx.attr.target:
         fail("Either path or target (and path) should be defined for the tool.")
     path = None
+    env = None
     if ctx.attr.target:
-        path = ctx.expand_location(ctx.attr.path, targets = [ctx.attr.target])
-        env = expand_locations_and_make_variables(ctx, ctx.attr.env, "env", [ctx.attr.target])
+        print("Command is ", ctx.attr.path)
+        _, resolved_bash_command, _ = ctx.resolve_command(
+        command = ctx.attr.path,
+        # attribute = "command (%s)" % command,
+        expand_locations = True,
+        make_variables = ctx.attr.env,
+        tools = [ctx.attr.target]
+        )
+
+        print("resolved_bash_command is ", resolved_bash_command)
+        path = resolved_bash_command[-1]
+        # env 
+
+        # path = ctx.expand_location(ctx.attr.path, targets = [ctx.attr.target])
+        # env = expand_locations_and_make_variables(ctx, ctx.attr.env, "env", [ctx.attr.target])
+        pass
     else:
         path = ctx.expand_location(ctx.attr.path)
         env = expand_locations_and_make_variables(ctx, ctx.attr.env, "env", [])
