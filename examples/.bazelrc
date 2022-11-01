@@ -1,4 +1,8 @@
-startup --output_user_root=C:/b
 #build --override_repository=bazel_skylib=C:\\msys64\\home\\jheaffey\\git\\bazel-skylib
 
 build --enable_runfiles
+
+# These are required otherwise pkg-config wrapper script runfiles paths are too long
+startup --windows_enable_symlinks
+build --action_env=MSYS=winsymlinks:nativestrict
+startup --output_user_root=C:/b

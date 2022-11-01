@@ -28,7 +28,7 @@ def _native_tool_toolchain_impl(ctx):
     path = None
     env = None
     if ctx.attr.target:
-        print("Command is ", ctx.attr.path)
+        # print("Command is ", ctx.attr.path)
         _, resolved_bash_command, _ = ctx.resolve_command(
         command = ctx.attr.path,
         # attribute = "command (%s)" % command,
@@ -37,7 +37,8 @@ def _native_tool_toolchain_impl(ctx):
         tools = [ctx.attr.target]
         )
 
-        print("resolved_bash_command is ", resolved_bash_command)
+        # print("resolved_bash_command is ", resolved_bash_command)
+        # print("manifests is ", input_manifests)
         path = resolved_bash_command[-1]
         # env 
 

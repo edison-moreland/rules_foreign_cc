@@ -48,6 +48,7 @@ def _access_and_expect_label_copied(toolchain_type_, ctx):
             if f.path.endswith("/" + tool_data.path):
                 cmd_file = f
                 break
+        # print("target is ", tool_data.target)
         return struct(
             deps = [tool_data.target],
             env = tool_data.env,

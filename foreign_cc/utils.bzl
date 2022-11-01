@@ -63,6 +63,12 @@ def runnable_binary(name, binary, foreign_cc_target, **kwargs):
         **kwargs
     )
 
+    # TODO use skylib to copy file or create symlink to output of of sh_binary to be able to give it a certain name, eg pkg-config.exe autotools, cmake etc pick it up
+    # or instead change name attribute of sh_binary to match "binary", although this conflicts eg in openssl BUILD file, the lib is called openssl and the runnable bin is called openssl
+    # Although this may not be necessary if autotools, cmake, meson can be told path to pkg-config.
+    # Or rules_foreign_cc could create the symlink.
+
+
     # native.genrule(
     #     name = name + "_genrule",
     #     srcs = [name + "_sh"],

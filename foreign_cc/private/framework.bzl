@@ -417,7 +417,7 @@ def cc_external_rule_impl(ctx, attrs):
     installdir_copy = copy_directory(ctx.actions, "$$INSTALLDIR$$", "copy_{}/{}".format(lib_name, lib_name))
     target_root = paths.dirname(installdir_copy.file.dirname)
 
-    data_dependencies = ctx.attr.data + ctx.attr.build_data + ctx.attr.toolchains
+    data_dependencies = ctx.attr.data + ctx.attr.build_data + ctx.attr.toolchains + attrs.tools_deps
 
     # Also add legacy dependencies while they're still available
     data_dependencies += ctx.attr.tools_deps + ctx.attr.additional_tools
@@ -488,11 +488,12 @@ def cc_external_rule_impl(ctx, attrs):
     tool_runfiles = []
     for data in data_dependencies:
         tool_runfiles += data[DefaultInfo].default_runfiles.files.to_list()
+    # print("tool runfiles are ", attrs.tools_deps)
 
 
     # print("built data is ", ctx.files.build_data)
     #<generated file external/rules_foreign_cc/toolchains/pkgconfig_tool_msvc_out.exe>
-    # print("declared inputs is ", inputs.declared_inputs[-1])
+    # print("declared inputs is ", data_dependencies)
     ctx.actions.run_shell(
         mnemonic = "Cc" + attrs.configure_name.capitalize() + "MakeRule",
         inputs = depset(inputs.declared_inputs),
@@ -504,7 +505,7 @@ def cc_external_rule_impl(ctx, attrs):
             legacy_tools +
             cc_toolchain.all_files.to_list() +
             tool_runfiles +
-            [data[DefaultInfo].files_to_run for data in data_dependencies] + [ inputs.declared_inputs[-1]],
+            [data[DefaultInfo].files_to_run for data in data_dependencies],
         command = wrapped_outputs.wrapper_script_file.path,
         execution_requirements = execution_requirements,
         use_default_shell_env = True,
@@ -550,7 +551,7 @@ def cc_external_rule_impl(ctx, attrs):
         wrapped_outputs.wrapper_script_file,
     ]
     output_groups[attrs.configure_name + "_logs"] = wrapped_files
-    #print("runfiles are  - ", runfiles.files)
+    # print("runfiles are  - ", runfiles.files)
     return [
         DefaultInfo(
             files = depset(direct = rule_outputs),

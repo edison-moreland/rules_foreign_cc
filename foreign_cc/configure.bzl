@@ -25,6 +25,7 @@ load("//toolchains/native_tools:tool_access.bzl", "get_make_data", "get_pkgconfi
 def _configure_make(ctx):
     make_data = get_make_data(ctx)
     pkg_config_data = get_pkgconfig_data(ctx)
+    # print(pkg_config_data)
 
     #print(pkg_config_data.deps[0][DefaultInfo].files_to_run.executable)
 
