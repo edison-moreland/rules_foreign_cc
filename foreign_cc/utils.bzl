@@ -55,7 +55,7 @@ def runnable_binary(name, binary, foreign_cc_target, **kwargs):
     )
 
     native.sh_binary(
-        name = name,
+        name = name + "_sh",
         deps = ["@bazel_tools//tools/bash/runfiles"],
         data = [name + "_fg"],
         srcs = [name + "_wrapper"],
@@ -96,16 +96,16 @@ def runnable_binary(name, binary, foreign_cc_target, **kwargs):
 
     # sh_binary provides more than one output file, preventing the use of make variable expansion such as "location"; the plural "locations" must be used instead
     # # Wrap the sh_binary in a skylib native_binary to faciliate single output and usage of singular make variable expansion, i.e. "location"
-    # native_binary(
-    #     name = name,
-    #     # Why does the below work but not name + "_sh"?
-    #     src = name + "_sh",
-    #     #src = name + "_sh",
-    #     out = name + "_out.exe",
-    #     data = [ name + "_sh", name + "_wrapper_copy", ":workaround", name + "_wrapper", ":workaround_fg", foreign_cc_target,  name + "_genrule", name + "_sh_fg"],
-    #     tags = tags,
-    #     **kwargs
-    # )
+    native_binary(
+        name = name,
+        # Why does the below work but not name + "_sh"?
+        src = name + "_sh",
+        #src = name + "_sh",
+        out = binary,
+        data = [name + "_wrapper_copy"],
+        tags = tags,
+        **kwargs
+    )
 
     # TODO instead try changing native_tool_toolchain to use ctx.resolve_command. See https://github.com/angular/dev-infra/commit/7605373472c9eb4aa0c35f6df2f02bb12db94e3c
     # If that fails, Try replacing sh_binary with custom starlark rule that does the same thing but outputs only one file. Or Try replacing sh_binary on windows for a genrule that produces a .bat script that calls bash.exe -c script.sh. See if BAZEL_SH can be used. Test when running in mingw and cmd promo 
@@ -113,13 +113,14 @@ def runnable_binary(name, binary, foreign_cc_target, **kwargs):
 
     # # TODO make sure it works with windows_enable_symlinks startup option. also set msys winsymblinks action env
     # # This is necessary because it seems that on windows sh_binary creates an .exe that must have the script with same name without exe extension, otherwise it fails. As we are using native_binary above we need to copy
-    # copy_file(
-    #     name = name + "_wrapper_copy",
-    #     src = name + "_wrapper",
-    #     out = name + "_out",
-    #     tags = tags + ["manual"],
-    #     **kwargs
-    # )
+    copy_file(
+        name = name + "_wrapper_copy",
+        src = name + "_wrapper",
+        # TODO handle this better
+        out = binary.split(".exe")[0],
+        tags = tags + ["manual"],
+        **kwargs
+    )
 
     # native.genrule(
     #     name = name + "_bat",

@@ -29,7 +29,7 @@ def create_configure_script(
     ext_build_dirs = inputs.ext_build_dirs
 
     script = pkgconfig_script(ext_build_dirs)
-    script.append("cd $$EXT_BUILD_ROOT$$ && find &&  pkgconfig_tool_msvc.exe --help && cd -")
+    script.append("cd $$EXT_BUILD_ROOT$$ && find &&  pkg-config.exe --help && cd -")
 
     root_path = "$$EXT_BUILD_ROOT$$/{}".format(root)
     configure_path = "{}/{}".format(root_path, configure_command)
