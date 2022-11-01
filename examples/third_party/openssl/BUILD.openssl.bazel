@@ -126,13 +126,10 @@ filegroup(
     visibility = ["//visibility:public"],
 )
 
-# binary could name without .exe prefix and the runnable_binary adds the prefix perhaps
-#runnable_binary(
-#    name = "runnable_openssl",
-#    binary = select({
-#        "@platforms//os:windows": "openssl.exe",
-#        "//conditions:default": "openssl",
-#    }),
-#    foreign_cc_target = "@openssl//:openssl",
-#    visibility = ["//visibility:public"],
-#)
+
+runnable_binary(
+    name = "runnable_openssl",
+    binary = "openssl",
+    foreign_cc_target = "@openssl//:openssl",
+    visibility = ["//visibility:public"],
+)

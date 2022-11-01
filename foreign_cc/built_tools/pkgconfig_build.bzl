@@ -106,7 +106,7 @@ def pkgconfig_tool(name, srcs, **kwargs):
 
     runnable_binary(
         name = "{}_msvc".format(name),
-        binary = "pkg-config.exe",
+        binary = "pkg-config",
         foreign_cc_target = "{}_msvc_build".format(name)
     )
 
