@@ -29,7 +29,8 @@ def create_configure_script(
     ext_build_dirs = inputs.ext_build_dirs
 
     script = pkgconfig_script(ext_build_dirs)
-    script.append("cd $$EXT_BUILD_ROOT$$ && find &&  pkg-config.exe --help && cd -")
+    # TODO the path to the built pkg-config isnt added to path, its parent dir is. This needs fixing in framework.bzl
+    script.append("cd $$EXT_BUILD_ROOT$$ && echo 'pkgconfig is ' && which pkg-config.exe && pkg-config.exe --help && cd -")
 
     root_path = "$$EXT_BUILD_ROOT$$/{}".format(root)
     configure_path = "{}/{}".format(root_path, configure_command)

@@ -96,6 +96,7 @@ def runnable_binary(name, binary, foreign_cc_target, match_binary_name=False, **
     #     visibility = ["//visibility:public"],
     # )    
 
+    # TODO instead of doing the below, instead just have sh_binary with "name" set to "binary" and have an alias so that the "name" target points to the sh_binary
     if match_binary_name:
         # sh_binary provides more than one output file, preventing the use of make variable expansion such as "location"; the plural "locations" must be used instead
         # # Wrap the sh_binary in a skylib native_binary to faciliate single output and usage of singular make variable expansion, i.e. "location"
