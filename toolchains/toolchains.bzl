@@ -31,6 +31,7 @@ def _current_toolchain_impl(ctx):
             toolchain,
             platform_common.TemplateVariableInfo(toolchain.data.env),
             DefaultInfo(
+                files = toolchain.data.target.files,
                 runfiles = toolchain.data.target.default_runfiles,
             ),
         ]

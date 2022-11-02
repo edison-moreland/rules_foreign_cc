@@ -66,13 +66,13 @@ genrule(
 #     output_group = "openssl",
 # )
 
-# genrule(
-#     name = "blob",
-#     srcs=[":openssl_fg"],
-#     outs=["blob.txt"],
-#     cmd="$(locations :openssl_fg) help > $@",
-#     executable=True
-# )
+genrule(
+    name = "blob2",
+    toolchains=["@rules_foreign_cc//toolchains:current_make_toolchain"],
+    outs=["blob2.txt"],
+    cmd="$(MAKE) --version > $@",
+    executable=True
+)
 
 # runnable_bin(
 #     name = "runnable_openssl",
