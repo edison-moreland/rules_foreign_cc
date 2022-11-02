@@ -21,11 +21,14 @@ def preinstalled_toolchains():
 def _current_toolchain_impl(ctx):
     toolchain = ctx.toolchains[ctx.attr._toolchain]
 
+    print("env is ", toolchain.data.env)
+
     if toolchain.data.target:
         return [
             toolchain,
             platform_common.TemplateVariableInfo(toolchain.data.env),
             DefaultInfo(
+                files = toolchain.data.target.files,
                 runfiles = toolchain.data.target.default_runfiles,
             ),
         ]

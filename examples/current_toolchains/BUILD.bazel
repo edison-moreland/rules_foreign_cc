@@ -1,0 +1,6 @@
+genrule(
+    name = "current_cmake_toolchain_test",
+    outs = ["out.txt"],
+    cmd = "$(CMAKE) --version > $@",
+    toolchains = ["@rules_foreign_cc//toolchains:current_cmake_toolchain"]
+)

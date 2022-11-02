@@ -190,9 +190,11 @@ filegroup(
 
 native_tool_toolchain(
     name = "cmake_tool",
+    env = {{{{"CMAKE": "bin/{{bin}}"}}}},
     path = "bin/{{bin}}",
     target = ":cmake_data",
 )
+
 \"\"\"
 
 _NINJA_BUILD_FILE = \"\"\"\\
