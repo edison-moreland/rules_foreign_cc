@@ -60,7 +60,7 @@ def runnable_binary(name, binary, foreign_cc_target, match_binary_name=False, **
     native.sh_binary(
         name = binary if match_binary_name else name,
         deps = ["@bazel_tools//tools/bash/runfiles"],
-        data = [name + "_fg"],
+        data = [name + "_fg", foreign_cc_target],
         srcs = [name + "_wrapper"],
         tags = tags + ["manual"],
         **kwargs

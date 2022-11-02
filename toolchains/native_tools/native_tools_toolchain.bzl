@@ -56,6 +56,7 @@ def _native_tool_toolchain_impl(ctx):
     print("the env is ", env)
 
     ## TODO on main branch, the env contains EXT_BUILD_ROOT prefix, which wont work in non foreign_cc rules, which is in the intended use case for the current_x_toolchains. First do a PR to just do expand_location, like done for path
+    # The PR should add tests for the current_x_toolchains, like my genrule in examples/BUILD.bazel
     return platform_common.ToolchainInfo(data = ToolInfo(
         env = env,
         path = path,
