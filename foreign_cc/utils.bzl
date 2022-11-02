@@ -58,7 +58,7 @@ def runnable_binary(name, binary, foreign_cc_target, match_binary_name=False, **
     )
 
     native.sh_binary(
-        name = name + "_sh" if match_binary_name else name,
+        name = binary if match_binary_name else name,
         deps = ["@bazel_tools//tools/bash/runfiles"],
         data = [name + "_fg"],
         srcs = [name + "_wrapper"],
@@ -98,22 +98,29 @@ def runnable_binary(name, binary, foreign_cc_target, match_binary_name=False, **
 
     # TODO instead of doing the below, instead just have sh_binary with "name" set to "binary" and have an alias so that the "name" target points to the sh_binary
     if match_binary_name:
+        native.alias(
+            name = name,
+            actual = binary,
+            visibility = ["//visibility:public"],
+        )
+
+
         # sh_binary provides more than one output file, preventing the use of make variable expansion such as "location"; the plural "locations" must be used instead
         # # Wrap the sh_binary in a skylib native_binary to faciliate single output and usage of singular make variable expansion, i.e. "location"
-        native_binary(
-            name = name,
-            # Why does the below work but not name + "_sh"?
-            src = name + "_sh",
-            #src = name + "_sh",
-            # out = binary,
-            out =  select({
-            "@platforms//os:windows": binary + ".exe",
-            "//conditions:default": binary,
-            }),        
-            data = [name + "_wrapper_copy"],
-            tags = tags,
-            **kwargs
-        )
+        # native_binary(
+        #     name = name,
+        #     # Why does the below work but not name + "_sh"?
+        #     src = name + "_sh",
+        #     #src = name + "_sh",
+        #     # out = binary,
+        #     out =  select({
+        #     "@platforms//os:windows": binary + ".exe",
+        #     "//conditions:default": binary,
+        #     }),        
+        #     data = [name + "_wrapper_copy"],
+        #     tags = tags,
+        #     **kwargs
+        # )
 
         # TODO instead try changing native_tool_toolchain to use ctx.resolve_command. See https://github.com/angular/dev-infra/commit/7605373472c9eb4aa0c35f6df2f02bb12db94e3c
         # If that fails, Try replacing sh_binary with custom starlark rule that does the same thing but outputs only one file. Or Try replacing sh_binary on windows for a genrule that produces a .bat script that calls bash.exe -c script.sh. See if BAZEL_SH can be used. Test when running in mingw and cmd promo 
@@ -123,14 +130,14 @@ def runnable_binary(name, binary, foreign_cc_target, match_binary_name=False, **
         # # This is necessary because it seems that on windows sh_binary creates an .exe that must have the script with same name without exe extension, otherwise it fails. As we are using native_binary above we need to copy
         # This is only required for windows
         # TODO - perhaps have arg to this macro to say if the file should have same name as the binary, in which case there must not be an existing target with same name. Have this arg default to false
-        copy_file(
-            name = name + "_wrapper_copy",
-            src = name + "_wrapper",
-            # TODO handle this better
-            out = binary,
-            tags = tags + ["manual"],
-            **kwargs
-        )
+        # copy_file(
+        #     name = name + "_wrapper_copy",
+        #     src = name + "_wrapper",
+        #     # TODO handle this better
+        #     out = binary,
+        #     tags = tags + ["manual"],
+        #     **kwargs
+        # )
 
     # native.genrule(
     #     name = name + "_bat",
