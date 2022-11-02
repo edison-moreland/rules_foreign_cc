@@ -11,15 +11,10 @@ load("@rules_foreign_cc//toolchains:prebuilt_toolchains_repository.bzl", "prebui
 _CMAKE_BUILD_FILE = """\
 load("@rules_foreign_cc//toolchains/native_tools:native_tools_toolchain.bzl", "native_tool_toolchain")
 load("@bazel_skylib//rules:native_binary.bzl", "native_binary")
+#load("@bazel_skylib//rules:copy_directory.bzl", "copy_directory")
+
 
 package(default_visibility = ["//visibility:public"])
-
-native_binary(
-    name = "cmake",
-    data = [":cmake_data"],
-    src = "bin/{bin}",
-    out = "{bin}",
-)
 
 filegroup(
     name = "cmake_data",
@@ -28,6 +23,7 @@ filegroup(
             "**",
         ],
         exclude = [
+            "**/* *", # Bazel does not support spaces in file names.
             "WORKSPACE",
             "WORKSPACE.bazel",
             "BUILD",
@@ -36,10 +32,28 @@ filegroup(
     ),
 )
 
+
+#copy_directory(
+#    name = "cmake",
+#    src = ".",
+#    out = "gendir",
+#)
+
+genrule(
+    name = "cmake",
+    srcs = [":cmake_data"],
+    outs = ["gendir"],
+    cmd = "mkdir $@ && cp $(locations :cmake_data) $@",
+)
+
+
+# location doesnt work if there are loads of files. native_binary provides one file with data.#
+# with native_binary and its data, need to enable runfiles on windows and symlinks
+
 native_tool_toolchain(
     name = "cmake_tool",
-    env = {{"CMAKE": "$(location :cmake)"}},
-    path = "bin/{bin}",
+    env = {{"CMAKE": "$(location :cmake)/bin/cmake.exe"}},
+    path = "$(location :cmake)/bin/cmake.exe",
     target = ":cmake",
 )
 
