@@ -10,11 +10,17 @@ filegroup(
 meson(
     name = "libffi",
     lib_source = ":all_srcs",
-    out_shared_libs = [
-        "ffi-7.dll",
-    ],
-    out_interface_libs = [
-        "ffi.lib",
-    ]
+    out_shared_libs = select({
+        "@platforms//os:windows": ["ffi-7.dll"],
+        "//conditions:default": ["libffi.so.7.1.0"],
+    }),
+    out_lib_dir = select({
+        "@platforms//os:windows": "lib",
+        "//conditions:default": "lib/x86_64-linux-gnu",
+    }),
+    out_interface_libs = select({
+        "@platforms//os:windows": ["ffi.lib"],
+        "//conditions:default": [],
+    }),
 )
 

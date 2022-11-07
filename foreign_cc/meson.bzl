@@ -40,11 +40,12 @@ def _meson_priv_impl(ctx):
     # TODO - like with cmake (i assume), only add ninja to tool deps if ninja generator is used
     ninja_data = get_ninja_data(ctx)
 
-    # TODO add cmake to the tool_deps, as meson delegates to cmake
+    # TODO add cmake to the tool_deps, as meson delegates to cmake. Does meson support pure "make" builds? if so, add "make" to tool deps
     # TODO add pkg-config to tool_deps, should first make built or prebuilt pkg-config toolchain (can download prebuilt artefacts from https://stackoverflow.com/a/1711338 or strawberry perl). If build from source it can be cross-platform
 
     tools_deps = ctx.attr.tools_deps + [ctx.attr.meson_bin]
     tools_deps += ninja_data.deps
+    
 
     attrs = create_attrs(
         ctx.attr,
