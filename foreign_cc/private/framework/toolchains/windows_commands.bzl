@@ -125,6 +125,14 @@ fi
     return FunctionAndCallInfo(text = text)
 
 def symlink_to_dir(source, target):
+
+'''
+ideas on how to speed up
+
+Could run symlink_contents_to_dir for every file 
+or could run as it is now but this function ignores files not tracked by bazel
+or just symlink (delegate to cp) the dir itself rather than all its recursive contents?
+'''
     text = """\
 if [[ -z "$1" ]]; then
   echo "arg 1 to symlink_to_dir is unexpectedly empty"
