@@ -95,7 +95,7 @@ def copy_dir_contents_to_dir(source, target):
         target = target,
     )
 
-def symlink_contents_to_dir(source, target):
+def symlink_contents_to_dir(source, target, replace=False):
     text = """\
 if [[ -z "$1" ]]; then
   echo "arg 1 to symlink_contents_to_dir is unexpectedly empty"
@@ -107,6 +107,7 @@ if [[ -z "$2" ]]; then
 fi
 local target="$2"
 mkdir -p "$target"
+local replace="$3"
 if [[ -f "$1" ]]; then
   ##symlink_to_dir## "$1" "$target"
 elif [[ -L "$1" ]]; then
@@ -118,13 +119,11 @@ elif [[ -d "$1" ]]; then
   local children=($($REAL_FIND -H "$1" -maxdepth 1 -mindepth 1))
   IFS=$SAVEIFS
   for child in "${children[@]}"; do
-    ##symlink_to_dir## "$child" "$target"
+    ##symlink_to_dir## "$child" "$target" "$replace"
   done
 fi
 """
     return FunctionAndCallInfo(text = text)
-
-def symlink_to_dir(source, target):
 
 '''
 ideas on how to speed up
@@ -132,7 +131,22 @@ ideas on how to speed up
 Could run symlink_contents_to_dir for every file 
 or could run as it is now but this function ignores files not tracked by bazel
 or just symlink (delegate to cp) the dir itself rather than all its recursive contents?
+
+i reckon replace_in_files is used for sandboxing and remote caching. This should only be required for built deps, which will contain bazel sandbox paths?
+it wont apply to 3rd party source. As such, when copying 3rd party source, just symlink the root dir. But maybe for configure_make we need to copy files
+in case they are written by build, in which case just copy the root dir
+
+----
+
+when configure_make is "configure_in_place" it runs copy_dir_contents_to_dir,  because the configure build may change a source file
+I could rename symlink_to_dir to be symlink_replace_to_dir, as well as the things that call it
+or symlink_to_dir and symlink_contents_to_dir have an optional arg of replace, which is false by default
+
+TODO make sure it works when symlinks are disabled, it should do a copy instead
 '''
+def symlink_to_dir(source, target, replace=True):
+
+
     text = """\
 if [[ -z "$1" ]]; then
   echo "arg 1 to symlink_to_dir is unexpectedly empty"
@@ -142,8 +156,11 @@ if [[ -z "$2" ]]; then
   echo "arg 2 to symlink_to_dir is unexpectedly empty"
   exit 1
 fi
+local replace_in_files="${3:-}"
+
 local target="$2"
 mkdir -p "$target"
+
 if [[ -f "$1" ]]; then
   # In order to be able to use `replace_in_files`, we ensure that we create copies of specfieid
   # files so updating them is possible.
@@ -157,6 +174,13 @@ elif [[ -L "$1" ]]; then
   local actual=$(readlink "$1")
   ##symlink_to_dir## "$actual" "$target"
 elif [[ -d "$1" ]]; then
+
+  # If not replacing in files, simply create a symbolic link rather than traversing tree of files, which can result in very slow builds
+  if [[ ! -n "$replace_in_files" ]]; then
+    ln -s -f "$1" "$target"
+    return
+  fi
+
   SAVEIFS=$IFS
   IFS=$'\n'
   local children=($($REAL_FIND -H "$1" -maxdepth 1 -mindepth 1))

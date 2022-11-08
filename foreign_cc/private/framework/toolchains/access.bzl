@@ -44,6 +44,7 @@ def call_shell(shell_context, method_, *args):
     if type(result) == _function_and_call_type:
         # Cache the rendered function for use when rendering
         # the full scrupt in `convert_shell_script_by_context`
+        print("method is ", method_)
         if not shell_context.prelude.get(method_):
             shell_context.prelude[method_] = shell_context.shell.define_function(method_, result.text)
 
