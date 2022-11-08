@@ -191,6 +191,7 @@ def do_function_call(text, shell_context):
         return replace_exports(after, shell_context)
 
     arguments = split_arguments(after.strip(" ")) if after else []
+    # print("funname is ", funname, "and arguments is ", arguments)
     return call_shell(shell_context, funname, *arguments)
 
 # buildifier: disable=function-docstring
