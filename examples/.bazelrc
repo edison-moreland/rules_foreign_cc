@@ -17,4 +17,4 @@ startup --windows_enable_symlinks
 build --action_env=MSYS=winsymlinks:nativestrict
 test --action_env=MSYS=winsymlinks:nativestrict
 
-startup --output_base=C:/b
+#startup --output_base=C:/b
