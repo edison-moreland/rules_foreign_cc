@@ -194,6 +194,7 @@ def _attrs():
 meson_priv = rule(
     doc = (
         "Rule for building external libraries with [Ninja](https://ninja-build.org/)."
+        # TODO update this documentation and say that windows requires --enable_runfiles
     ),
     attrs = _attrs(),
     fragments = CC_EXTERNAL_RULE_FRAGMENTS,

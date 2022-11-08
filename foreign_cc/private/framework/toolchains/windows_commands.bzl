@@ -156,11 +156,9 @@ if [[ -z "$2" ]]; then
   echo "arg 2 to symlink_to_dir is unexpectedly empty"
   exit 1
 fi
-local replace_in_files="${3:-}"
-
 local target="$2"
 mkdir -p "$target"
-
+local replace_in_files="${3:-}"
 if [[ -f "$1" ]]; then
   # In order to be able to use `replace_in_files`, we ensure that we create copies of specfieid
   # files so updating them is possible.
