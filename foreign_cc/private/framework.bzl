@@ -461,6 +461,7 @@ def cc_external_rule_impl(ctx, attrs):
         )
     ]
 
+    # print("script lines is ", script_lines)
     script_text = "\n".join([
         shebang(ctx),
         convert_shell_script(ctx, script_lines),
@@ -697,10 +698,12 @@ def _copy_deps_and_tools(files):
         lines.append("##mkdirs## $$EXT_BUILD_DEPS$$/bin")
     for tool in files.tools_files:
         #TODO copying entire meson tree takes a while on windows, could it be possible to instead run symlink_to_dir on files tracked by bazel?
-        lines.append("##symlink_to_dir## $$EXT_BUILD_ROOT$$/{} $$EXT_BUILD_DEPS$$/bin/".format(tool))
+        lines.append("##symlink_to_dir## $$EXT_BUILD_ROOT$$/{} $$EXT_BUILD_DEPS$$/bin/ False".format(tool))
 
     for ext_dir in files.ext_build_dirs:
-        lines.append("##symlink_to_dir## $$EXT_BUILD_ROOT$$/{} $$EXT_BUILD_DEPS$$".format(_file_path(ext_dir)))
+        # TODO make sure this is the one to set to true
+        print("ext dir is ", ext_dir)
+        lines.append("##symlink_to_dir## $$EXT_BUILD_ROOT$$/{} $$EXT_BUILD_DEPS$$ True".format(_file_path(ext_dir)))
 
     lines.append("##children_to_path## $$EXT_BUILD_DEPS$$/bin")
     lines.append("##path## $$EXT_BUILD_DEPS$$/bin")
@@ -718,8 +721,9 @@ def _symlink_contents_to_dir(dir_name, files_list):
     for file in files_list:
         path = _file_path(file).strip()
         if path:
+            # TODO check if this needs to be true in some circumstances, can pass in replace_in_files arg to this func
             lines.append("##symlink_contents_to_dir## \
-$$EXT_BUILD_ROOT$$/{} $$EXT_BUILD_DEPS$$/{}".format(path, dir_name))
+$$EXT_BUILD_ROOT$$/{} $$EXT_BUILD_DEPS$$/{} False".format(path, dir_name))
 
     return lines
 
