@@ -484,7 +484,6 @@ def cc_external_rule_impl(ctx, attrs):
     # is found that guarantees bash exists or appropriately errors out.
 
     tool_runfiles = []
-    print("data deps are", data_dependencies)
     for data in data_dependencies:
         tool_runfiles += data[DefaultInfo].default_runfiles.files.to_list()
 
@@ -700,8 +699,6 @@ def _copy_deps_and_tools(files):
         lines.append("##symlink_to_dir## $$EXT_BUILD_ROOT$$/{} $$EXT_BUILD_DEPS$$/bin/ False".format(tool))
 
     for ext_dir in files.ext_build_dirs:
-        # TODO make sure this is the one to set to true
-        print("ext dir is ", ext_dir)
         lines.append("##symlink_to_dir## $$EXT_BUILD_ROOT$$/{} $$EXT_BUILD_DEPS$$ True".format(_file_path(ext_dir)))
 
     lines.append("##children_to_path## $$EXT_BUILD_DEPS$$/bin")
