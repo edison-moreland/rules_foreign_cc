@@ -1,0 +1,12 @@
+load("@rules_foreign_cc//foreign_cc:defs.bzl", "meson")
+
+filegroup(
+    name = "all_srcs",
+    srcs = glob(["**"]),
+)
+
+meson(
+    name = "mesa",
+    lib_source = ":all_srcs",
+    default_visibility = ["//visibility:public"]
+)

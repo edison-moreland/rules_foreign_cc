@@ -7,6 +7,7 @@ load("//toolchains:toolchains.bzl", "built_toolchains", "prebuilt_toolchains", "
 
 # buildifier: disable=unnamed-macro
 # TODO if meson on windows requires symlinks, rather than add yet another option, instead have meson and pkgconfig toolchains require --extra_toolchains on all platforms
+# Say that meson requires --enable_runfiles on windows
 def rules_foreign_cc_dependencies(
         native_tools_toolchains = [],
         register_default_tools = True,
