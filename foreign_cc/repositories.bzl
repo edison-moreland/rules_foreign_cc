@@ -13,6 +13,7 @@ def rules_foreign_cc_dependencies(
         cmake_version = "3.23.2",
         make_version = "4.4",
         ninja_version = "1.11.0",
+        meson_version = "0.63.0",
         pkgconfig_version = "0.29.2",
         register_preinstalled_tools = True,
         register_built_tools = True,
@@ -40,6 +41,8 @@ def rules_foreign_cc_dependencies(
 
         ninja_version: The target version of the ninja toolchain if `register_default_tools`
             or `register_built_tools` is set to `True`.
+
+        meson_version: The target version of the pkg_config toolchain if `register_built_tools` is set to `True`.
 
         pkgconfig_version: The target version of the pkg_config toolchain if `register_built_tools` is set to `True`.
 
@@ -72,6 +75,7 @@ def rules_foreign_cc_dependencies(
             cmake_version = cmake_version,
             make_version = make_version,
             ninja_version = ninja_version,
+            meson_version = meson_version,
             pkgconfig_version = pkgconfig_version,
             register_toolchains = register_toolchains,
             register_built_pkgconfig_toolchain = register_built_pkgconfig_toolchain,
@@ -98,16 +102,13 @@ def rules_foreign_cc_dependencies(
         url = "https://github.com/bazelbuild/rules_python/archive/refs/tags/0.10.2.tar.gz",
     )
 
-
-
     maybe(
         http_archive,
-        name = "meson",
+        name = "meson_src",
         build_file = Label("//foreign_cc/private:BUILD.meson.bazel"),
         sha256 = "3b51d451744c2bc71838524ec8d96cd4f8c4793d5b8d5d0d0a9c8a4f7c94cd6f",
         strip_prefix = "meson-0.63.0",
         url = "https://github.com/mesonbuild/meson/releases/download/0.63.0/meson-0.63.0.tar.gz",
     )
 
-    # TODO have versioned meson, like versioned other tools above
-    # Should we have a boolean as to register hermetic python toolchains? 
+    # TODO Should we have a boolean as to register hermetic python toolchains?  

@@ -12,11 +12,11 @@ load(
     "create_attrs",
     "expand_locations_and_make_variables",
 )
-load("//toolchains/native_tools:tool_access.bzl", "get_ninja_data")
+load("//toolchains/native_tools:tool_access.bzl", "get_ninja_data", "get_meson_data")
 load("//foreign_cc/private:make_script.bzl", "pkgconfig_script")
 load("@rules_python//python:defs.bzl", "py_binary")
 
-def _meson_priv_impl(ctx):
+def _meson_impl(ctx):
     """The implementation of the `meson` rule
 
     Args:
@@ -26,7 +26,8 @@ def _meson_priv_impl(ctx):
         list: A list of providers. See `cc_external_rule_impl`
     """
 
-    meson_zip_file = ctx.attr.meson_bin[OutputGroupInfo].python_zip_file.to_list()[0].path
+    meson_data = get_meson_data(ctx)
+    # meson_zip_file = ctx.attr.meson_bin[OutputGroupInfo].python_zip_file.to_list()[0].path
     # TODO if --nobuild_python_zip, perhaps the python_zip_file is None or doesn't exist (can do hasattr())
     # :[PyInfo, PyRuntimeInfo, InstrumentedFilesInfo, PyCcLinkParamsProvider, OutputGroupInfo]>
     # TODO - could extract the zip file, use "sed" to change is PythonZip to return False, mv "runfiles" to __main__.py.exe.runfiles.
@@ -34,8 +35,8 @@ def _meson_priv_impl(ctx):
     # rules_foreign_cc CI could build libffi with a python zip and glib without one
 
     # TODO move the logic of getting python interpreter path up to here
-    meson_path = "$EXT_BUILD_ROOT/" + meson_zip_file
-    meson_path = "$EXT_BUILD_ROOT/" + ctx.executable.meson_bin.path
+    # meson_path = "$EXT_BUILD_ROOT/" + meson_zip_file
+    # meson_path = "$EXT_BUILD_ROOT/" + ctx.executable.meson_bin.path
 
     # TODO - like with cmake (i assume), only add ninja to tool deps if ninja generator is used
     ninja_data = get_ninja_data(ctx)
@@ -44,8 +45,7 @@ def _meson_priv_impl(ctx):
     # TODO add pkg-config to tool_deps, should first make built or prebuilt pkg-config toolchain (can download prebuilt artefacts from https://stackoverflow.com/a/1711338 or strawberry perl). If build from source it can be cross-platform
     # TODO ensure cppflags and ldflags are set correctly so that deps are included. How does CMake rule do it for libs that don't generate a pkgconfig?
 
-    tools_deps = ctx.attr.tools_deps + [ctx.attr.meson_bin]
-    tools_deps += ninja_data.deps
+    tools_deps = ctx.attr.tools_deps + meson_data.deps + ninja_data.deps
     
 
     attrs = create_attrs(
@@ -53,7 +53,7 @@ def _meson_priv_impl(ctx):
         configure_name = "Meson",
         create_configure_script = _create_meson_script,
         tools_deps = tools_deps,
-        meson_path = meson_path,
+        meson_path = meson_data.path,
         ninja_path = ninja_data.path
     )
     return cc_external_rule_impl(ctx, attrs)
@@ -167,12 +167,6 @@ def _attrs():
             doc = "Arguments for the meson install command",
             mandatory = False,
         ),
-       "meson_bin": attr.label(
-            doc = "Arguments for the meson install command",
-            cfg = "exec",
-            executable = True,
-            mandatory = True,
-        ),
         "options": attr.string_dict(
             doc = (
                 "Meson option entries to initialize (they will be passed with `-Dkey=value`)"
@@ -191,7 +185,7 @@ def _attrs():
     })
     return attrs
 
-meson_priv = rule(
+meson = rule(
     doc = (
         "Rule for building external libraries with [Ninja](https://ninja-build.org/)."
         # TODO update this documentation and say that windows requires --enable_runfiles
@@ -199,8 +193,9 @@ meson_priv = rule(
     attrs = _attrs(),
     fragments = CC_EXTERNAL_RULE_FRAGMENTS,
     output_to_genfiles = True,
-    implementation = _meson_priv_impl,
+    implementation = _meson_impl,
     toolchains = [
+        "@rules_foreign_cc//toolchains:meson_toolchain",
         "@rules_foreign_cc//toolchains:ninja_toolchain",
         "@rules_foreign_cc//foreign_cc/private/framework:shell_toolchain",
         "@bazel_tools//tools/cpp:toolchain_type",
@@ -211,27 +206,4 @@ meson_priv = rule(
     # version is updated to a release of Bazel containing the new default for this setting.
     incompatible_use_toolchain_transition = True,
 )
-
-def meson(name, requirements=None, **kwargs):
-    tags = kwargs.pop("tags", [])
-
-    py_binary(
-        name = "meson_for_{}".format(name),
-        srcs = [
-            "@meson//:meson.py",
-        ],
-        data = ["@meson//:runtime"],
-        python_version = "PY3",
-        deps = requirements,
-        tags = tags + ["manual"],
-        main = "@meson//:meson.py",
-    )
-
-    # perhaps rename the rule to _meson
-    meson_priv(
-        name = name,
-        meson_bin = ":meson_for_{}".format(name),
-        tags = tags,
-        **kwargs
-    )
 
