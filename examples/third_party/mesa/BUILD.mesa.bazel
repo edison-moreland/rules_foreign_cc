@@ -1,12 +1,22 @@
-load("@rules_foreign_cc//foreign_cc:defs.bzl", "meson")
+load("@rules_foreign_cc//foreign_cc:defs.bzl", "meson_with_requirements", "meson")
+load("@pip//:requirements.bzl", "requirement")
 
 filegroup(
     name = "all_srcs",
     srcs = glob(["**"]),
 )
 
-meson(
+#meson(
+#    name = "mesa",
+#    lib_source = ":all_srcs",
+#    visibility = ["//visibility:public"]
+#)
+
+meson_with_requirements(
     name = "mesa",
     lib_source = ":all_srcs",
-    default_visibility = ["//visibility:public"]
+    requirements = [
+        requirement("mako"),
+    ],
+    visibility = ["//visibility:public"]
 )

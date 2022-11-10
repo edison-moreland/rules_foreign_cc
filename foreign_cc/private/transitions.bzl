@@ -2,6 +2,7 @@
 
 load("//foreign_cc:providers.bzl", "ForeignCcDepsInfo")
 
+
 def _extra_toolchains_transition_impl(settings, attrs):
     return {"//command_line_option:extra_toolchains": attrs.extra_toolchains + settings["//command_line_option:extra_toolchains"]}
 
@@ -41,8 +42,8 @@ extra_toolchains_transitioned_foreign_cc_target = rule(
     incompatible_use_toolchain_transition = True,
 )
 
-def make_variant(name, rule, toolchain, **kwargs):
-    """ Wrapper macro around foreign cc rules to force usage of the given make variant toolchain.
+def foreign_cc_rule_variant(name, rule, toolchain, **kwargs):
+    """ Wrapper macro around foreign cc rules to force usage of the given  toolchain.
 
     Args:
         name: The target name
@@ -51,12 +52,12 @@ def make_variant(name, rule, toolchain, **kwargs):
         **kwargs: Remaining keyword arguments
     """
 
-    make_variant_target_name = name + "_"
+    foreign_cc_rule_target_name = name + "_"
 
     tags = kwargs.pop("tags", [])
 
     rule(
-        name = make_variant_target_name,
+        name = foreign_cc_rule_target_name,
         tags = tags + ["manual"],
         **kwargs
     )
@@ -64,6 +65,6 @@ def make_variant(name, rule, toolchain, **kwargs):
     extra_toolchains_transitioned_foreign_cc_target(
         name = name,
         extra_toolchains = [toolchain],
-        target = make_variant_target_name,
+        target = foreign_cc_rule_target_name,
         tags = tags,
     )

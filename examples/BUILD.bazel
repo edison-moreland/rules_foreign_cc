@@ -1,3 +1,5 @@
+load("@rules_python//python/pip_install:requirements.bzl", "compile_pip_requirements")
+
 # TODO: This should not be necessary but there appears to be some inconsistent
 # behavior with the use of `constraint_value`s in `select` statements. A support
 # thread was started at the end of https://github.com/bazelbuild/bazel/pull/12071
@@ -39,3 +41,11 @@ test_suite(
     tags = ["manual"],
     tests = ["@rules_foreign_cc_examples_third_party//:windows_tests"],
 )
+
+# compile_pip_requirements makes a //:requirements.update target (invoke with bazel run) and //:requirements_test target (invoke with bazel test)
+compile_pip_requirements(
+    name = "requirements",
+    requirements_in = "requirements.txt",
+    requirements_txt = "requirements_lock.txt",
+)
+

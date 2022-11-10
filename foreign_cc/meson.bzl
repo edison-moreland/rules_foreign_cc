@@ -15,6 +15,11 @@ load(
 load("//toolchains/native_tools:tool_access.bzl", "get_ninja_data", "get_meson_data")
 load("//foreign_cc/private:make_script.bzl", "pkgconfig_script")
 load("@rules_python//python:defs.bzl", "py_binary")
+load("//foreign_cc/built_tools:meson_build.bzl", "meson_tool")
+load("//toolchains/native_tools:native_tools_toolchain.bzl", "native_tool_toolchain")
+load("//foreign_cc/private:transitions.bzl", "foreign_cc_rule_variant")
+load("//foreign_cc:utils.bzl", "full_label")
+
 
 def _meson_impl(ctx):
     """The implementation of the `meson` rule
@@ -207,3 +212,44 @@ meson = rule(
     incompatible_use_toolchain_transition = True,
 )
 
+
+def meson_with_requirements(name, requirements, **kwargs):
+    """ Wrapper macro around foreign cc rules to force usage of the given make variant toolchain.
+
+    Args:
+        name: The target name
+        rule: The foreign cc rule to instantiate, e.g. configure_make
+        toolchain: The desired make variant toolchain to use, e.g. @rules_foreign_cc//toolchains:preinstalled_nmake_toolchain
+        **kwargs: Remaining keyword arguments
+    """
+    tags = kwargs.pop("tags", [])
+
+
+    meson_tool(
+        name = "meson_tool_for_{}".format(name),
+        main = "@meson_src//:meson.py",
+        data = ["@meson_src//:runtime"],
+        requirements = requirements,
+        tags = tags + ["manual"],
+    )
+
+    native_tool_toolchain(
+        name = "built_meson_for_{}".format(name),
+        env = {"MESON": "$(execpath :meson_tool_for_{})".format(name)},
+        path = "$(execpath :meson_tool_for_{})".format(name),
+        target = ":meson_tool_for_{}".format(name),
+    )
+
+    native.toolchain(
+        name = "built_meson_toolchain_for_{}".format(name),
+        toolchain = "built_meson_for_{}".format(name),
+        toolchain_type = "@rules_foreign_cc//toolchains:meson_toolchain",
+    )
+
+    foreign_cc_rule_variant(
+        name = name,
+        rule = meson,
+        toolchain = full_label("built_meson_toolchain_for_{}".format(name)),
+        # toolchain = "@rules_foreign_cc//toolchains:built_meson_toolchain",
+        **kwargs
+    )
