@@ -1,0 +1,1 @@
+get mesa building on windows. the mesa logs show that cmake, pkgconfig and python3 are from the system rather than hermetic, fix this and check it is hermetic on linux
