@@ -18,5 +18,15 @@ meson_with_requirements(
     requirements = [
         requirement("mako"),
     ],
+    build_data = select({
+        "@bazel_tools//src/conditions:host_windows": ["@winflexbison//:flex", "@winflexbison//:bison"],
+        "//conditions:default": []
+    }),
+    env = select({
+        "@bazel_tools//src/conditions:host_windows": {
+            "PATH": "$$(dirname $$EXT_BUILD_ROOT$$/$(location @winflexbison//:flex)):$$(dirname $$EXT_BUILD_ROOT$$/$(location @winflexbison//:bison))",
+        },
+        "//conditions:default": {},
+        }),
     visibility = ["//visibility:public"]
 )

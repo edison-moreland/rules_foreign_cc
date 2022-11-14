@@ -1,0 +1,14 @@
+load("@bazel_skylib//rules:native_binary.bzl", "native_binary")
+
+[
+    native_binary(
+        name = bin,
+        src = "win_{}.exe".format(bin),
+        out = "{}.exe".format(bin),
+        visibility = ["//visibility:public"],
+    )
+    for bin in [
+        "flex",
+        "bison",
+    ]
+]
