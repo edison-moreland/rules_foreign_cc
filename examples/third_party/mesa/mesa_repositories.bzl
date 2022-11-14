@@ -12,13 +12,24 @@ def mesa_repositories():
         strip_prefix = "mesa-22.1.4",
         url = "https://archive.mesa3d.org//mesa-22.1.4.tar.xz",
     )
-    # maybe(
-    #     http_archive,
-    #     name = "winflexbison",
-    #     build_file = Label("//mesa:BUILD.winflexbison.bazel"),
-    #     sha256 = "8d324b62be33604b2c45ad1dd34ab93d722534448f55a16ca7292de32b6ac135",
-    #     url = "https://github.com/lexxmark/winflexbison/releases/download/v2.5.25/win_flex_bison-2.5.25.zip",
-    # )
+    maybe(
+        http_archive,
+        name = "libpciaccess",
+        build_file = Label("//mesa:BUILD.libpciaccess.bazel"),
+        sha256 = "84413553994aef0070cf420050aa5c0a51b1956b404920e21b81e96db6a61a27",
+        strip_prefix = "libpciaccess-0.16",
+        url = "https://www.x.org/archive//individual/lib/libpciaccess-0.16.tar.gz",
+    )
+
+    maybe(
+        http_archive,
+        name = "libdrm",
+        build_file = Label("//mesa:BUILD.libdrm.bazel"),
+        sha256 = "00b07710bd09b35cd8d80eaf4f4497fe27f4becf467a9830f1f5e8324f8420ff",
+        strip_prefix = "libdrm-2.4.112",
+        url = "https://dri.freedesktop.org/libdrm/libdrm-2.4.112.tar.xz",
+    )
+
     maybe(
         http_archive,
         name = "winflexbison",

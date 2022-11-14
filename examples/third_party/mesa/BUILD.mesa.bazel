@@ -1,4 +1,4 @@
-load("@rules_foreign_cc//foreign_cc:defs.bzl", "meson_with_requirements", "meson")
+load("@rules_foreign_cc//foreign_cc:defs.bzl", "meson_with_requirements")
 load("@pip//:requirements.bzl", "requirement")
 
 filegroup(
@@ -50,6 +50,13 @@ meson_with_requirements(
         ":msvc_compiler": [
             "libgallium_wgl.lib",
             "opengl32.lib"
+        ],
+        "//conditions:default": [],
+    }),
+    deps = select({
+        "@platforms//os:linux": [
+            "@libpciaccess",
+            "@libdrm"
         ],
         "//conditions:default": [],
     }),

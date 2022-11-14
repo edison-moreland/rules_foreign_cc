@@ -19,6 +19,3 @@ meson(
     ],
     out_lib_dir = "lib/x86_64-linux-gnu",
 )
-
-
-# TODO instead of libdrm (which is probably only linux), look at cross platform project at https://mesonbuild.com/Users.html
