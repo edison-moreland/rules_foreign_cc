@@ -1,14 +1,39 @@
 load("@bazel_skylib//rules:native_binary.bzl", "native_binary")
 
-[
-    native_binary(
-        name = bin,
-        src = "win_{}.exe".format(bin),
-        out = "{}.exe".format(bin),
-        visibility = ["//visibility:public"],
-    )
-    for bin in [
-        "flex",
-        "bison",
-    ]
-]
+# cannot copy to make a dir unless store files from "locations" into an array and get the common root folder
+
+
+filegroup(
+    name = "all_srcs",
+    srcs = glob(["**"]),
+    visibility = ["//visibility:public"],
+)
+
+genrule(
+    name = "winflexbison",
+    srcs = [":all_srcs"],
+    outs = ["winflexbison_dir"],
+    #cmd = "mkdir $@ && cp $(locations :all_srcs) $@",
+    cmd = "touch $@"
+)
+
+#[
+#    #native_binary(
+#    #    name = bin,
+#    #    src = "win_{}.exe".format(bin),
+#    #    out = "{}.exe".format(bin),
+#    #    visibility = ["//visibility:public"],
+#    #    data = glob(["data/**"]),
+#    #)
+#
+#    genrule(
+#        name = bin,
+#        src = glob(["**"]),
+#        out = "{}_dir".format(bin),
+#        cmd = "cp 
+#    )
+#    for bin in [
+#        "flex",
+#        "bison",
+#    ]
+#]

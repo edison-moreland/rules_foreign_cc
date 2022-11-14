@@ -65,6 +65,7 @@ meson(
 #    env = {
 #    "PATH": "$$(dirname $$EXT_BUILD_ROOT$$/$(PYTHON3))"
 #    }
+    # TODO use msvc_compiler in select above for interface libs and shared libs
     env = select({
         ":msvc_compiler": {
             "INCLUDE": "$$EXT_BUILD_DEPS/include",

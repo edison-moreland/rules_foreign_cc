@@ -12,6 +12,17 @@ filegroup(
 #    visibility = ["//visibility:public"]
 #)
 
+# TODO mesa depends on zlib, if not specified here then meson will fetch and build it
+
+# TODO define this config_setting only once rather than in a few places
+config_setting(
+    name = "msvc_compiler",
+    flag_values = {
+        "@bazel_tools//tools/cpp:compiler": "msvc-cl",
+    },
+)
+
+
 meson_with_requirements(
     name = "mesa",
     lib_source = ":all_srcs",
@@ -19,14 +30,29 @@ meson_with_requirements(
         requirement("mako"),
     ],
     build_data = select({
-        "@bazel_tools//src/conditions:host_windows": ["@winflexbison//:flex", "@winflexbison//:bison"],
+        "@bazel_tools//src/conditions:host_windows": ["@winflexbison//:all_srcs"],
         "//conditions:default": []
     }),
     env = select({
         "@bazel_tools//src/conditions:host_windows": {
-            "PATH": "$$(dirname $$EXT_BUILD_ROOT$$/$(location @winflexbison//:flex)):$$(dirname $$EXT_BUILD_ROOT$$/$(location @winflexbison//:bison))",
+            #"PATH": "$$(dirname $$EXT_BUILD_ROOT$$/$(location @winflexbison//:flex)):$$(dirname $$EXT_BUILD_ROOT$$/$(location @winflexbison//:bison))",
+            "PATH": "/c/Users/jheaffey/git/rules_foreign_cc/examples/bazel-examples/external/winflexbison"
         },
         "//conditions:default": {},
         }),
+    out_shared_libs = select({
+        ":msvc_compiler": [
+            "libgallium_wgl.dll",
+            "opengl32.dll",
+        ],
+        "//conditions:default": [ ],
+    }),
+    out_interface_libs = select({
+        ":msvc_compiler": [
+            "libgallium_wgl.lib",
+            "opengl32.lib"
+        ],
+        "//conditions:default": [],
+    }),
     visibility = ["//visibility:public"]
 )
