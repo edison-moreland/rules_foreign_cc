@@ -1,21 +1,26 @@
-load("@bazel_skylib//rules:native_binary.bzl", "native_binary")
+#load("@bazel_skylib//rules:native_binary.bzl", "native_binary")
+load("@rules_foreign_cc//foreign_cc:defs.bzl", "cmake")
 
 # cannot copy to make a dir unless store files from "locations" into an array and get the common root folder
+
+# or could have a CMakeLists.txt which just copies the files and then rules_foreign_cc makes a gendir
+# but the built in bazel patch cannot add files, would need to use system patch command
+
+# Or could build them from source
 
 
 filegroup(
     name = "all_srcs",
     srcs = glob(["**"]),
-    visibility = ["//visibility:public"],
 )
 
-genrule(
-    name = "winflexbison",
-    srcs = [":all_srcs"],
-    outs = ["winflexbison_dir"],
-    #cmd = "mkdir $@ && cp $(locations :all_srcs) $@",
-    cmd = "touch $@"
-)
+#genrule(
+#    name = "winflexbison",
+#    srcs = [":all_srcs"],
+#    outs = ["winflexbison_dir"],
+#    #cmd = "mkdir $@ && cp $(locations :all_srcs) $@",
+#    cmd = "touch $@"
+#)
 
 #[
 #    #native_binary(
@@ -37,3 +42,24 @@ genrule(
 #        "bison",
 #    ]
 #]
+
+
+cmake(
+    name = "winflexbison",
+    generate_args = select({
+        "@platforms//os:windows": ["-GNinja"],
+        "//conditions:default": [],
+    }),
+    lib_source = ":all_srcs",
+    out_binaries = ["win_flex.exe", "win_bison.exe"],
+    out_bin_dir = "",
+    visibility = ["//visibility:public"],
+)
+
+filegroup(
+    name = "gen_dir",
+    srcs = [":winflexbison"],
+    output_group = "gen_dir",
+    visibility = ["//visibility:public"],
+)
+
