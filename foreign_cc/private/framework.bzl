@@ -402,6 +402,8 @@ def cc_external_rule_impl(ctx, attrs):
     lib_name = attrs.lib_name or ctx.attr.name
 
     inputs = _define_inputs(attrs)
+    # for i in inputs.declared_inputs:
+    #     print(i)
     outputs = _define_outputs(ctx, attrs, lib_name)
     out_cc_info = _define_out_cc_info(ctx, attrs, inputs, outputs)
 
@@ -428,6 +430,7 @@ def cc_external_rule_impl(ctx, attrs):
     if not attrs.postfix_script:
         postfix_script = []
 
+    # print(inputs.headers + inputs.include_dirs)
     script_lines = [
         "##echo## \"\"",
         "##echo## \"{}\"".format(lib_header),
@@ -467,6 +470,8 @@ def cc_external_rule_impl(ctx, attrs):
         convert_shell_script(ctx, script_lines),
         "",
     ])
+
+    # print("script_text is ", script_lines)
     wrapped_outputs = wrap_outputs(ctx, lib_name, attrs.configure_name, script_text)
 
     rule_outputs = outputs.declared_outputs + [installdir_copy.file]
@@ -489,6 +494,8 @@ def cc_external_rule_impl(ctx, attrs):
 
     for tool in attrs.tools_deps:
         tool_runfiles += tool[DefaultInfo].default_runfiles.files.to_list()
+
+    # print("inputs are ", inputs.declared_inputs)
 
     ctx.actions.run_shell(
         mnemonic = "Cc" + attrs.configure_name.capitalize() + "MakeRule",
@@ -872,6 +879,19 @@ def _define_inputs(attrs):
     # These variables are needed for correct C/C++ providers constraction,
     # they should contain all libraries and include directories.
     cc_info_merged = cc_common.merge_cc_infos(cc_infos = cc_infos)
+    # print(cc_info_merged.compilation_context.headers.to_list())
+    # issue may be that cc_info_merged.compilation_context.headers.to_list() makes headers appear in sandbox but not the libs
+    # libs = []
+    # for linker_input in cc_info_merged.linking_context.linker_inputs.to_list():
+    #     for lib in linker_input.libraries:
+    #         if lib.dynamic_library:
+    #             libs.append(lib.dynamic_library) 
+    #             print(lib.resolved_symlink_dynamic_library)
+    #         if lib.static_library:
+    #             libs.append(lib.static_library)
+
+    # print("libs is ", _collect_libs(cc_info_merged.linking_context))
+    # sanbox issue - Is the issue due to the fact that shared objects are treated differently, to static libs? shared libs go in the _so folder
     return InputFiles(
         headers = bazel_headers,
         include_dirs = bazel_system_includes,
@@ -884,7 +904,7 @@ def _define_inputs(attrs):
                           bazel_libs +
                           tools_files +
                           input_files +
-                          cc_info_merged.compilation_context.headers.to_list() +
+                          cc_info_merged.compilation_context.headers.to_list() +  _collect_libs(cc_info_merged.linking_context) + 
                           ext_build_dirs,
     )
 
@@ -953,7 +973,9 @@ def _extract_libraries(library_to_link):
         library_to_link.static_library,
         library_to_link.pic_static_library,
         library_to_link.dynamic_library,
+        library_to_link.resolved_symlink_dynamic_library,
         library_to_link.interface_library,
+        library_to_link.resolved_symlink_interface_library
     ]
 
 def _collect_libs(cc_linking):

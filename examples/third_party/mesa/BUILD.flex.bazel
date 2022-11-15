@@ -1,3 +1,4 @@
+
 load("@rules_foreign_cc//foreign_cc:defs.bzl", "configure_make")
 
 package(default_visibility = ["//visibility:public"])
@@ -11,20 +12,13 @@ filegroup(
 )
 
 configure_make(
-    name = "m4",
-    env = select({
-        "@platforms//os:macos": {"AR": ""},
-        "//conditions:default": {},
-    }),
+    name = "flex",
     lib_source = ":all_srcs",
-    out_binaries = [
-        "m4",
-    ],
+    out_binaries = ["flex"],
 )
 
 filegroup(
-    name = "m4_exe",
-    srcs = [":m4"],
-    output_group = "m4",
-    visibility = ["//visibility:public"],
+    name = "flex_exe",
+    srcs = [":flex"],
+    output_group = "flex",
 )

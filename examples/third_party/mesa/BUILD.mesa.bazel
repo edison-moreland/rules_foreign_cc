@@ -31,20 +31,35 @@ meson_with_requirements(
     ],
     build_data = select({
         "@bazel_tools//src/conditions:host_windows": ["@winflexbison//:gen_dir"],
-        "//conditions:default": []
+        "//conditions:default": ["@bison//:gen_dir", "@flex//:flex_exe", "@m4//:m4_exe"]
     }),
     env = select({
         "@bazel_tools//src/conditions:host_windows": {
-            "PATH": "$$(dirname $$EXT_BUILD_ROOT$$/$(location @winflexbison//:gen_dir))/winflexbison",
+            "PATH": "$$(dirname $$EXT_BUILD_ROOT$$/$(location @winflexbison//:gen_dir))/winflexbison:$$PATH",
         },
-        "//conditions:default": {},
+        "//conditions:default": {
+            #TODO rather than dirname etc, add bison and flex in the same way as m4
+            "PATH": "$$(dirname $$EXT_BUILD_ROOT$$/$(location @bison//:gen_dir))/bison/bin:$$(dirname $$EXT_BUILD_ROOT$$/$(location @flex//:flex_exe)):$$EXT_BUILD_DEPS$$/bin/m4/bin/:$$PATH",
+            #TODO see if i can set BISON and FLEX variables like M4 below and see if meson picks them up
+            "M4": "$$EXT_BUILD_ROOT$$/$(location @m4//:m4_exe)",
+            # TODO use ext_build_deps instead of location:
+            "BISON_PKGDATADIR": "$$(dirname $$EXT_BUILD_ROOT$$/$(location @bison//:gen_dir))/bison/share/bison"
+        },
         }),
     out_shared_libs = select({
         ":msvc_compiler": [
             "libgallium_wgl.dll",
             "opengl32.dll",
         ],
-        "//conditions:default": [ ],
+        "//conditions:default": [
+            "libEGL.so",
+            "libgbm.so",
+            "libglapi.so",
+            "libGLESv1_CM.so",
+            "libGLESv2.so",
+            "libvulkan_intel.so",
+            "libxatracker.so"
+        ],
     }),
     out_interface_libs = select({
         ":msvc_compiler": [
@@ -55,10 +70,27 @@ meson_with_requirements(
     }),
     deps = select({
         "@platforms//os:linux": [
+            "@bison",
             "@libpciaccess",
-            "@libdrm"
+            "@libdrm",
+            "@libxcb",
+            "@libxshmfence"
         ],
         "//conditions:default": [],
     }),
+    # TODO have select on linux here, and say that we are disabling because building llvm would make our CI take forever
+    options = {
+        "llvm": "disabled",
+        "vulkan-drivers": "intel",
+        "gallium-drivers": "nouveau",
+        # have platform set to windows on windows
+        "platforms": "x11",
+        "glx": "disabled"
+    },
+    out_lib_dir = "lib/x86_64-linux-gnu",
+    #tool_prefix = "ls -l  $$EXT_BUILD_DEPS/libdrm/lib && blob",
     visibility = ["//visibility:public"]
 )
+
+
+# bison doesnt seem to work when in sandbox, need to replace_in_files for something.

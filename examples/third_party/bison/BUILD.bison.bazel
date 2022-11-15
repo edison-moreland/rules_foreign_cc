@@ -25,4 +25,19 @@ configure_make(
         "yacc",
     ],
     out_static_libs = ["liby.a"],
+    out_data_dirs = ["share"],
 )
+
+filegroup(
+    name = "bison_exe",
+    srcs = [":bison"],
+    output_group = "bison",
+)
+
+filegroup(
+    name = "gen_dir",
+    srcs = [":bison"],
+    output_group = "gen_dir",
+    visibility = ["//visibility:public"],
+)
+
