@@ -12,7 +12,7 @@ load(
     "create_attrs",
     "expand_locations_and_make_variables",
 )
-load("//toolchains/native_tools:tool_access.bzl", "get_ninja_data", "get_meson_data")
+load("//toolchains/native_tools:tool_access.bzl", "get_ninja_data", "get_meson_data", "get_cmake_data", "get_pkgconfig_data")
 load("//foreign_cc/private:make_script.bzl", "pkgconfig_script")
 load("@rules_python//python:defs.bzl", "py_binary")
 load("//foreign_cc/built_tools:meson_build.bzl", "meson_tool")
@@ -44,13 +44,17 @@ def _meson_impl(ctx):
     # meson_path = "$EXT_BUILD_ROOT/" + ctx.executable.meson_bin.path
 
     # TODO - like with cmake (i assume), only add ninja to tool deps if ninja generator is used
+
+    cmake_data = get_cmake_data(ctx)
     ninja_data = get_ninja_data(ctx)
+    pkg_config_data = get_pkgconfig_data(ctx)
+
 
     # TODO add cmake to the tool_deps, as meson delegates to cmake. Does meson support pure "make" builds? if so, add "make" to tool deps
     # TODO add pkg-config to tool_deps, should first make built or prebuilt pkg-config toolchain (can download prebuilt artefacts from https://stackoverflow.com/a/1711338 or strawberry perl). If build from source it can be cross-platform
     # TODO ensure cppflags and ldflags are set correctly so that deps are included. How does CMake rule do it for libs that don't generate a pkgconfig?
 
-    tools_deps = ctx.attr.tools_deps + meson_data.deps + ninja_data.deps
+    tools_deps = ctx.attr.tools_deps + meson_data.deps + cmake_data.deps + ninja_data.deps + pkg_config_data.deps
     
 
     attrs = create_attrs(
@@ -201,7 +205,9 @@ meson = rule(
     implementation = _meson_impl,
     toolchains = [
         "@rules_foreign_cc//toolchains:meson_toolchain",
+        "@rules_foreign_cc//toolchains:cmake_toolchain",
         "@rules_foreign_cc//toolchains:ninja_toolchain",
+        "@rules_foreign_cc//toolchains:pkgconfig_toolchain",
         "@rules_foreign_cc//foreign_cc/private/framework:shell_toolchain",
         "@bazel_tools//tools/cpp:toolchain_type",
         # TODO - required to prevent extract of python zipper into tmpdir that is later removed, may not work tho

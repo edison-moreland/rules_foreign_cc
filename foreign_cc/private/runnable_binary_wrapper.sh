@@ -1,5 +1,17 @@
 #!/usr/bin/env bash
 
+#pwd
+# pwd is C:\b\execroot\rules_foreign_cc_examples\bazel-out\x64_windows-fastbuild\bin\external\rules_foreign_cc\toolchains\pkg-config.exe.runfiles\rules_foreign_cc_examples
+
+EXE=BIN
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+RUNFILES_DIR=${SCRIPT_DIR}/$(basename ${EXE}).runfiles
+cd ${RUNFILES_DIR}
+
+# if [[ ! -z "${EXT_BUILD_ROOT}" ]]; then
+# cd "${EXT_BUILD_ROOT}"
+# fi
+
 # --- begin runfiles.bash initialization v2 ---
 # Copy-pasted from the Bazel Bash runfiles library v2. (@bazel_tools//tools/bash/runfiles)
 set -uo pipefail; f=bazel_tools/tools/bash/runfiles/runfiles.bash
@@ -26,6 +38,7 @@ fi
 SHARED_LIBS_ARRAY=()
 while IFS=  read -r -d $'\0'; do
     SHARED_LIBS_ARRAY+=("$REPLY")
+    # echo "The reply is $REPLY"
 done < <(find . -name "*${SHARED_LIB_SUFFIX}" -print0)
 
 # Add paths to shared library directories to SHARED_LIBS_DIRS_ARRAY
@@ -39,10 +52,43 @@ IFS=" " read -r -a SHARED_LIBS_DIRS_ARRAY <<< "$(tr ' ' '\n' <<< "${SHARED_LIBS_
 
 # Allow unbound variable here, in case LD_LIBRARY_PATH or similar is not already set
 set +u
+echo "SHARED_LIB_SUFFIX is ${SHARED_LIB_SUFFIX}"
 for dir in "${SHARED_LIBS_DIRS_ARRAY[@]}"; do
+    # echo "dir is ${RUNFILES_DIR}"
     export ${LIB_PATH_VAR}="$dir":"${!LIB_PATH_VAR}"
 done
 set -u
 
-EXE=BIN
-exec $(rlocation "${EXE#external/}") "$@"
+
+
+#script dir is /c/b/execroot/rules_foreign_cc_examples/bazel-out/x64_windows-fastbuild/bin/external/rules_foreign_cc/toolchains
+echo "script dir is ${SCRIPT_DIR}"
+ls ${SCRIPT_DIR}
+
+echo "exe is ${EXE}"
+# echo "runfiles dir is ${RUNFILESDIR}"
+
+echo "runfiles dir is ${RUNFILES_DIR}"
+echo "rlocation is $(rlocation ${EXE#external/})"
+# echo "about to find"
+EXE_PATH=$(rlocation "${EXE#external/}")
+ls ${SCRIPT_DIR}/pkg-config.exe.runfiles
+#/usr/bin/realpath .
+
+
+# find .
+#cmd /c echo %CD%
+# The current working directory seems to be C:\b\execroot\rules_foreign_cc_examples\bazel-out\x64_windows-fastbuild\bin\external\rules_foreign_cc\toolchains\pkg-config.exe.runfiles\rules_foreign_cc_examples
+
+# set +u
+# if [[ ! -z "${EXT_BUILD_ROOT}" ]]; then
+# cd -
+# fi
+# set -u
+
+cd -
+exec ${EXE_PATH} "$@"
+
+
+
+# TODO check that runfiles tree for pkg-config is created when running meson
