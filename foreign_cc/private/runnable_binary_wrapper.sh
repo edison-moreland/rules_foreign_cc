@@ -2,6 +2,7 @@
 
 #pwd
 # pwd is C:\b\execroot\rules_foreign_cc_examples\bazel-out\x64_windows-fastbuild\bin\external\rules_foreign_cc\toolchains\pkg-config.exe.runfiles\rules_foreign_cc_examples
+# echo "args are $@"
 
 EXE=BIN
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
@@ -52,7 +53,7 @@ IFS=" " read -r -a SHARED_LIBS_DIRS_ARRAY <<< "$(tr ' ' '\n' <<< "${SHARED_LIBS_
 
 # Allow unbound variable here, in case LD_LIBRARY_PATH or similar is not already set
 set +u
-echo "SHARED_LIB_SUFFIX is ${SHARED_LIB_SUFFIX}"
+# echo "SHARED_LIB_SUFFIX is ${SHARED_LIB_SUFFIX}"
 for dir in "${SHARED_LIBS_DIRS_ARRAY[@]}"; do
     # echo "dir is ${RUNFILES_DIR}"
     export ${LIB_PATH_VAR}="$dir":"${!LIB_PATH_VAR}"
@@ -62,17 +63,17 @@ set -u
 
 
 #script dir is /c/b/execroot/rules_foreign_cc_examples/bazel-out/x64_windows-fastbuild/bin/external/rules_foreign_cc/toolchains
-echo "script dir is ${SCRIPT_DIR}"
-ls ${SCRIPT_DIR}
+# echo "script dir is ${SCRIPT_DIR}"
+# ls ${SCRIPT_DIR}
 
-echo "exe is ${EXE}"
+#echo "exe is ${EXE}"
 # echo "runfiles dir is ${RUNFILESDIR}"
 
-echo "runfiles dir is ${RUNFILES_DIR}"
-echo "rlocation is $(rlocation ${EXE#external/})"
+#echo "runfiles dir is ${RUNFILES_DIR}"
+#echo "rlocation is $(rlocation ${EXE#external/})"
 # echo "about to find"
 EXE_PATH=$(rlocation "${EXE#external/}")
-ls ${SCRIPT_DIR}/pkg-config.exe.runfiles
+#ls ${SCRIPT_DIR}/pkg-config.exe.runfiles
 #/usr/bin/realpath .
 
 
@@ -86,7 +87,13 @@ ls ${SCRIPT_DIR}/pkg-config.exe.runfiles
 # fi
 # set -u
 
-cd -
+cd - &> /dev/null
+# echo "pkgconfig path is ${PKG_CONFIG_PATH}"
+# export PKG_CONFIG_PATH=C:/b/execroot/rules_foreign_cc_examples/bazel-out/x64_windows-fastbuild/bin/external/glib/glib.ext_build_deps/pcre/lib/pkgconfig
+
+#export PKG_CONFIG_PATH=C:/b/execroot/rules_foreign_cc_examples/bazel-out/x64_windows-fastbuild/bin/external/glib/glib.ext_build_deps/libffi/lib/pkgconfig:C:/b/execroot/rules_foreign_cc_examples/bazel-out/x64_windows-fastbuild/bin/external/glib/glib.ext_build_deps/pcre/lib/pkgconfig:C:/b/execroot/rules_foreign_cc_examples/bazel-out/x64_windows-fastbuild/bin/external/glib/glib.ext_build_deps/zlib/share/pkgconfig
+
+# export PKG_CONFIG_PATH=/c/b/execroot/rules_foreign_cc_examples/bazel-out/x64_windows-fastbuild/bin/external/glib/glib.ext_build_deps/pcre/lib/pkgconfig:/c/b/execroot/rules_foreign_cc_examples/bazel-out/x64_windows-fastbuild/bin/external/glib/glib.ext_build_deps/zlib/share/pkgconfig
 exec ${EXE_PATH} "$@"
 
 

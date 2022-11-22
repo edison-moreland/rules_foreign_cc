@@ -192,7 +192,12 @@ def increment_pkg_config_path(source):
 local children=$($REAL_FIND "$1" -mindepth 1 -name '*.pc')
 # assume there is only one directory with pkg config
 for child in $children; do
-  export PKG_CONFIG_PATH="$${PKG_CONFIG_PATH:-}$$:$(dirname $child)"
+  LIB_DIR=$(dirname $child)
+  # pkg-config requires that paths contain forward slashes only, so replace backward slashes with forward slashes
+  #LIB_DIR=$${LIB_DIR//\\\\//}$$
+  # pkg-config requires unix paths, e.g of the form /c/Users/..., rather than C:/Users/...
+  LIB_DIR=$(cygpath $${LIB_DIR//\\\\//}$$)
+  export PKG_CONFIG_PATH="$${PKG_CONFIG_PATH:-}$$:$${LIB_DIR}$$"
   return
 done
 """
