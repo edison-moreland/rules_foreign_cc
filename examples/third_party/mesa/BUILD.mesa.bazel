@@ -79,15 +79,21 @@ meson_with_requirements(
         "//conditions:default": [],
     }),
     # TODO have select on linux here, and say that we are disabling because building llvm would make our CI take forever
-    options = {
-        "llvm": "disabled",
-        "vulkan-drivers": "intel",
-        "gallium-drivers": "nouveau",
-        # have platform set to windows on windows
-        "platforms": "x11",
-        "glx": "disabled"
-    },
-    out_lib_dir = "lib/x86_64-linux-gnu",
+    options = select({
+            "@platforms//os:linux": {
+                "llvm": "disabled",
+                "vulkan-drivers": "intel",
+                "gallium-drivers": "nouveau",
+                # have platform set to windows on windows
+                "platforms": "x11",
+                "glx": "disabled"
+            },
+            "//conditions:default": {},
+    }),
+    out_lib_dir = select({
+        "@platforms//os:linux": "lib/x86_64-linux-gnu",
+        "//conditions:default": "lib",
+    }),
     #tool_prefix = "ls -l  $$EXT_BUILD_DEPS/libdrm/lib && blob",
     visibility = ["//visibility:public"]
 )
