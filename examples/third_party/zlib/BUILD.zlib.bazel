@@ -16,6 +16,12 @@ cmake(
         "@platforms//os:windows": ["-GNinja"],
         "//conditions:default": [],
     }),
+    cache_entries = select({
+        "@platforms//os:linux": {
+            "CMAKE_C_FLAGS": "${CMAKE_C_FLAGS:-} -fPIC",
+        },
+        "//conditions:default": {},
+    }),    
     lib_source = ":all_srcs",
     out_static_libs = select({
         "@platforms//os:windows": ["z.lib"],

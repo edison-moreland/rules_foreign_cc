@@ -17,6 +17,6 @@ startup --windows_enable_symlinks
 build --action_env=MSYS=winsymlinks:nativestrict
 test --action_env=MSYS=winsymlinks:nativestrict
 
-startup --output_base=C:/b
+#startup --output_base=C:/b
 
-build --override_repository=meson_src=C:\\Users\\jheaffey\\git\\meson-0.63.0
+#build --override_repository=meson_src=C:\\Users\\jheaffey\\git\\meson-0.63.0
