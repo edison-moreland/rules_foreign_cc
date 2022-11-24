@@ -3,3 +3,5 @@ get mesa building on windows. the mesa logs show that cmake, pkgconfig and pytho
 Add mesa and glib build test to Linux, windows and mac
 
 # sanbox issue - Is the issue due to the fact that shared objects are treated differently, to static libs? shared libs go in the _so folder while static libs are added to sandbox where they were before
+
+# TODO - after adding PKG_CONFIG and CMAKE env vars to meson build, the build changed and it seems that system packages werent found with pkg-config, but the hermetic pkg-config should have been on the path as it is in ext_build_deps, why isnt it?

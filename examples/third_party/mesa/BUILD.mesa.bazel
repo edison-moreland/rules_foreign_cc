@@ -74,7 +74,15 @@ meson_with_requirements(
             "@libpciaccess",
             "@libdrm",
             "@libxcb",
-            "@libxshmfence"
+            "@libxshmfence",
+            "@expat",
+            "@libxau",
+            "@xorgproto",
+            "@libxdmcp",
+            "@libx11",
+            "@libxrandr",
+            "@libxext",
+            "@libxrender",
         ],
         "//conditions:default": [],
     }),
@@ -94,7 +102,7 @@ meson_with_requirements(
         "@platforms//os:linux": "lib/x86_64-linux-gnu",
         "//conditions:default": "lib",
     }),
-    #tool_prefix = "ls -l  $$EXT_BUILD_DEPS/libdrm/lib && blob",
+    tool_prefix = "pkg-config --version && ",
     visibility = ["//visibility:public"]
 )
 

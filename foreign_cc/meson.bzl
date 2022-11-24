@@ -63,7 +63,9 @@ def _meson_impl(ctx):
         create_configure_script = _create_meson_script,
         tools_deps = tools_deps,
         meson_path = meson_data.path,
-        ninja_path = ninja_data.path
+        cmake_path = cmake_data.path,
+        ninja_path = ninja_data.path,
+        pkg_config_path = pkg_config_data.path
     )
     return cc_external_rule_impl(ctx, attrs)
 
@@ -87,7 +89,10 @@ def _create_meson_script(configureParameters):
     script = pkgconfig_script(configureParameters.inputs.ext_build_dirs)
 
     # do a "git grep" in meson source code repo for cmake and pkg config variables and set them also, like how NINJA is set below. Have a comment linking to this part of the meson source code to say that these variables can be used
+    script.append("##export_var## CMAKE {}".format(attrs.cmake_path))
     script.append("##export_var## NINJA {}".format(attrs.ninja_path))
+    script.append("##export_var## PKG_CONFIG {}".format(attrs.pkg_config_path))
+
 
     root = detect_root(ctx.attr.lib_source)
 
