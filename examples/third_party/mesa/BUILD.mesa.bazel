@@ -35,11 +35,11 @@ meson_with_requirements(
     }),
     env = select({
         "@bazel_tools//src/conditions:host_windows": {
-            "PATH": "$$(dirname $$EXT_BUILD_ROOT$$/$(location @winflexbison//:gen_dir))/winflexbison:$$PATH",
+            "PATH": "$$(dirname $$EXT_BUILD_ROOT$$/$(location @winflexbison//:gen_dir))/winflexbison:$$(dirname $$EXT_BUILD_ROOT$$/$(PYTHON3)):$$PATH",
         },
         "//conditions:default": {
             #TODO rather than dirname etc, add bison and flex in the same way as m4
-            "PATH": "$$(dirname $$EXT_BUILD_ROOT$$/$(location @bison//:gen_dir))/bison/bin:$$(dirname $$EXT_BUILD_ROOT$$/$(location @flex//:flex_exe)):$$EXT_BUILD_DEPS$$/bin/m4/bin/:$$PATH",
+            "PATH": "$$(dirname $$EXT_BUILD_ROOT$$/$(location @bison//:gen_dir))/bison/bin:$$(dirname $$EXT_BUILD_ROOT$$/$(location @flex//:flex_exe)):$$EXT_BUILD_DEPS$$/bin/m4/bin/:$$(dirname $$EXT_BUILD_ROOT$$/$(PYTHON3)):$$PATH",
             #TODO see if i can set BISON and FLEX variables like M4 below and see if meson picks them up
             "M4": "$$EXT_BUILD_ROOT$$/$(location @m4//:m4_exe)",
             # TODO use ext_build_deps instead of location:
@@ -102,7 +102,7 @@ meson_with_requirements(
         "@platforms//os:linux": "lib/x86_64-linux-gnu",
         "//conditions:default": "lib",
     }),
-    tool_prefix = "pkg-config --version && ",
+    toolchains = ["@rules_python//python:current_py_toolchain"],
     visibility = ["//visibility:public"]
 )
 

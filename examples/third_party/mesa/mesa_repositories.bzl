@@ -8,6 +8,11 @@ def mesa_repositories():
         http_archive,
         name = "mesa",
         build_file = Label("//mesa:BUILD.mesa.bazel"),
+        patches = [
+            # This patch is required for meson to find the hermetic python interpreter
+            Label("//mesa:mesa.patch"),
+
+        ],
         sha256 = "670d8cbe8b72902a45ea2da68a9da4dc4a5d99c5953a926177adbce1b1640b76",
         strip_prefix = "mesa-22.1.4",
         url = "https://archive.mesa3d.org//mesa-22.1.4.tar.xz",
