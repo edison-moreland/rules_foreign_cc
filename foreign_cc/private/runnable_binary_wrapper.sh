@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# TODO could do $0 rather than basename?
+
 #pwd
 # pwd is C:\b\execroot\rules_foreign_cc_examples\bazel-out\x64_windows-fastbuild\bin\external\rules_foreign_cc\toolchains\pkg-config.exe.runfiles\rules_foreign_cc_examples
 # echo "args are $@"
