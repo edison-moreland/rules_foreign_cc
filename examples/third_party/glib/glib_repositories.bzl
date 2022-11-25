@@ -8,9 +8,9 @@ def glib_repositories():
         http_archive,
         name = "glib",
         build_file = Label("//glib:BUILD.glib.bazel"),
-        strip_prefix = "glib-2.73.2",
-        sha256 = "5f3ee36e34f4aaab393c3e3dc46fb01b32f7ead6c88d41d7f20d88a49cdef1d9",
-        url = "https://download.gnome.org/sources/glib/2.73/glib-2.73.2.tar.xz",
+        strip_prefix = "glib-2.75.0",
+        sha256 = "6dde8e55cc4a2c83d96797120b08bcffb5f645b2e212164ae22d63c40e0e6360",
+        url = "https://download.gnome.org/sources/glib/2.75/glib-2.75.0.tar.xz",
     )
     maybe(
         http_archive,
