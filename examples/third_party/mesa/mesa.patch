@@ -1,0 +1,11 @@
+--- meson.build	2022-07-15 18:42:47.000000000 +0100
++++ meson.build	2022-11-25 12:05:34.617405600 +0000
+@@ -1002,7 +1002,7 @@
+   ]
+ endif
+ 
+-prog_python = import('python').find_installation('python3')
++prog_python = import('python').find_installation()
+ has_mako = run_command(
+   prog_python, '-c',
+   '''
