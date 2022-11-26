@@ -1,6 +1,6 @@
 """ This file contains useful utilities """
 
-def _full_label(label):
+def full_label(label):
     return native.repository_name() + "//" + native.package_name() + ":" + label
 
 def runnable_binary(name, binary, foreign_cc_target, match_binary_name = False, **kwargs):
@@ -44,7 +44,7 @@ def runnable_binary(name, binary, foreign_cc_target, match_binary_name = False, 
         name = name + "_wrapper",
         srcs = ["@rules_foreign_cc//foreign_cc/private:runnable_binary_wrapper.sh", name + "_fg"],
         outs = [name + "_wrapper.sh"],
-        cmd = "sed s@BIN@$(rootpath {})@g $(location @rules_foreign_cc//foreign_cc/private:runnable_binary_wrapper.sh) > $@".format(_full_label(name + "_fg")),
+        cmd = "sed s@BIN@$(rootpath {})@g $(location @rules_foreign_cc//foreign_cc/private:runnable_binary_wrapper.sh) > $@".format(full_label(name + "_fg")),
         tags = tags + ["manual"],
     )
 
