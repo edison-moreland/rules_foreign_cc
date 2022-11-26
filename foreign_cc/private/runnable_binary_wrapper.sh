@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+
+EXE=BIN
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+RUNFILES_DIR=${SCRIPT_DIR}/$(basename ${EXE}).runfiles
+cd ${RUNFILES_DIR}
+
 # --- begin runfiles.bash initialization v2 ---
 # Copy-pasted from the Bazel Bash runfiles library v2. (@bazel_tools//tools/bash/runfiles)
 set -uo pipefail; f=bazel_tools/tools/bash/runfiles/runfiles.bash
@@ -10,6 +16,8 @@ source "$(grep -sm1 "^$f " "$0.runfiles_manifest" | cut -f2- -d' ')" 2>/dev/null
 source "$(grep -sm1 "^$f " "$0.exe.runfiles_manifest" | cut -f2- -d' ')" 2>/dev/null || \
 { echo>&2 "ERROR: cannot find $f"; exit 1; }; f=; set -e
 # --- end runfiles.bash initialization v2 ---
+
+EXE_PATH=$(rlocation "${EXE#external/}")
 
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     SHARED_LIB_SUFFIX=".so*"
@@ -44,5 +52,5 @@ for dir in "${SHARED_LIBS_DIRS_ARRAY[@]}"; do
 done
 set -u
 
-EXE=BIN
-exec $(rlocation "${EXE#external/}") "$@"
+cd - &> /dev/null
+exec ${EXE_PATH} "$@"
