@@ -24,5 +24,14 @@ configure_make(
         "bison",
         "yacc",
     ],
+    # Bison depends on m4sugar.m4 in the "share" directory at runtime
+    out_data_dirs = ["share"],
     out_static_libs = ["liby.a"],
+)
+
+filegroup(
+    name = "gen_dir",
+    srcs = [":bison"],
+    output_group = "gen_dir",
+    visibility = ["//visibility:public"],
 )
