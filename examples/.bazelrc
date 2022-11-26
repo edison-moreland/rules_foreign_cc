@@ -4,8 +4,9 @@ build --action_env=PROCESSOR_ARCHITECTURE
 build --action_env=USERPROFILE
 
 
-# todo - get this working as i use it in my bazel-example repo. Perhaps to do with the fact tthat RUNFILES_MANIFEST_ONLY is set in the build_script.sh?
+# Required when using the built meson toolchain on windows
 build --nobuild_python_zip
+
 build --enable_runfiles
 test --enable_runfiles
 startup --windows_enable_symlinks
