@@ -61,6 +61,17 @@ def mesa_repositories():
         url = "https://github.com/lexxmark/winflexbison/archive/refs/tags/v2.5.25.tar.gz",
     )
 
+
+    maybe(
+        http_archive,
+        name = "glslang",
+        build_file = Label("//mesa:BUILD.glslang.bazel"),
+        sha256 = "7795a97450fecd9779f3d821858fbc2d1a3bf1dd602617d95b685ccbcabc302f",
+        strip_prefix = "glslang-11.12.0",
+        url = "https://github.com/KhronosGroup/glslang/archive/refs/tags/11.12.0.tar.gz",
+    )
+
+
     maybe(
         http_archive,
         name = "libxcb",

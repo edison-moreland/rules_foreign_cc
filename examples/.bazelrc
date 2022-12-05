@@ -12,3 +12,5 @@ build --enable_runfiles
 startup --windows_enable_symlinks
 build --action_env=MSYS=winsymlinks:nativestrict
 test --action_env=MSYS=winsymlinks:nativestrict
+
+build --override_repository=mesa=/home/jheaffey/git/mesa

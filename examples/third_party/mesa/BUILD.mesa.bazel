@@ -21,6 +21,7 @@ meson_with_requirements(
             "@bison//:gen_dir",
             "@flex//:flex_exe",
             "@m4//:m4_exe",
+            "@glslang//:glslangValidator",
         ],
     }),
     env = select({
@@ -30,7 +31,7 @@ meson_with_requirements(
         "//conditions:default": {
             "BISON_PKGDATADIR": "$$(dirname $$EXT_BUILD_ROOT$$/$(location @bison//:gen_dir))/bison/share/bison",
             "M4": "$$EXT_BUILD_ROOT$$/$(location @m4//:m4_exe)",
-            "PATH": "$$(dirname $$EXT_BUILD_ROOT$$/$(location @bison//:gen_dir))/bison/bin:$$(dirname $$EXT_BUILD_ROOT$$/$(location @flex//:flex_exe)):$$EXT_BUILD_DEPS$$/bin/m4/bin/:$$(dirname $$EXT_BUILD_ROOT$$/$(PYTHON3)):$$PATH",
+            "PATH": "$$(dirname $$EXT_BUILD_ROOT$$/$(location @bison//:gen_dir))/bison/bin:$$(dirname $$EXT_BUILD_ROOT$$/$(location @flex//:flex_exe)):$$EXT_BUILD_DEPS$$/bin/m4/bin/:$$(dirname $$EXT_BUILD_ROOT$$/$(location @glslang//:glslangValidator)):$$(dirname $$EXT_BUILD_ROOT$$/$(PYTHON3)):$$PATH",
         },
     }),
     lib_source = ":all_srcs",
@@ -94,4 +95,5 @@ meson_with_requirements(
         ],
         "//conditions:default": [],
     }),
+    tool_prefix = "which glslangValidator && "
 )

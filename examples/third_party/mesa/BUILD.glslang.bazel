@@ -1,0 +1,28 @@
+load("@rules_foreign_cc//foreign_cc:defs.bzl", "cmake")
+
+package(default_visibility = ["//visibility:public"])
+
+filegroup(
+    name = "all_srcs",
+    srcs = glob(["**"]),
+)
+
+cmake(
+    name = "glslang",
+    cache_entries = {
+        "ENABLE_CTEST": "OFF",
+    },
+    generate_args = select({
+        "@platforms//os:windows": ["-GNinja"],
+        "//conditions:default": [],
+    }),
+    lib_source = ":all_srcs",
+    out_binaries = ["glslangValidator"],
+)
+
+filegroup(
+    name = "glslangValidator",
+    srcs = [":glslang"],
+    output_group = "glslangValidator",
+)
+
