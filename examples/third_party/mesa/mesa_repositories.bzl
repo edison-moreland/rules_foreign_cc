@@ -11,7 +11,14 @@ def mesa_repositories():
         build_file = Label("//mesa:BUILD.mesa.bazel"),
         patches = [
             # This patch is required for meson to find the hermetic python interpreter
-            Label("//mesa:mesa.patch"),
+            Label("//mesa:mesa.meson.build.patch"),
+            Label("//mesa:mesa.src_loader_meson.build.patch"),
+            Label("//mesa:mesa.src_intel_vulkan_meson.build.patch"),
+            Label("//mesa:mesa.src_vulkan_util_meson.build.patch"),
+            Label("//mesa:mesa.src_gbm_meson.build.patch"),
+            Label("//mesa:mesa.src_gallium_frontends_dri_meson.build.patch"),
+            Label("//mesa:mesa.src_gallium_targets_dri_meson.build.patch"),
+            Label("//mesa:mesa.src_egl_meson.build.patch")
         ],
         sha256 = "670d8cbe8b72902a45ea2da68a9da4dc4a5d99c5953a926177adbce1b1640b76",
         strip_prefix = "mesa-22.1.4",

@@ -16,6 +16,11 @@ configure_make(
         "@platforms//os:linux": ["@m4//:m4_exe"],
         "//conditions:default": [],
     }),
+    configure_options = select({
+        # See https://github.com/westes/flex/issues/428#issuecomment-539277966
+        "@platforms//os:linux": ["CFLAGS='-D_GNU_SOURCE'"],
+        "//conditions:default": [],
+    }),
     env = select({
         "@platforms//os:linux": {
             "PATH": "$$(dirname $$EXT_BUILD_ROOT$$/$(location @m4//:m4_exe)):$$PATH",

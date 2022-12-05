@@ -1,0 +1,1 @@
+bazel build @mesa//:mesa --disk_cache /data/rules_foreign_cc/bazel_disk_cache/ --repository_cache /data/rules_foreign_cc/bazel_repo_cache

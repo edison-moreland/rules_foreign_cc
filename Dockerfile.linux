@@ -1,0 +1,14 @@
+FROM gcc:12.1.0
+
+#May need this
+#ENV DEBIAN_FRONTEND="noninteractive"
+RUN apt update && apt install -y \
+  gcc \
+  g++ \
+  ca-certificates
+
+### Install Android SDK and NDK as jheaffey.
+RUN useradd -ms /bin/bash jheaffey
+USER jheaffey
+WORKDIR /home/jheaffey
+
