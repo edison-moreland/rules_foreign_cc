@@ -13,8 +13,8 @@ filegroup(
 configure_make(
     name = "flex",
     build_data = select({
-        "@platforms//os:linux": ["@m4//:m4_exe"],
-        "//conditions:default": [],
+        "@platforms//os:windows": [],
+        "//conditions:default": ["@m4//:m4_exe"],
     }),
     configure_options = select({
         # See https://github.com/westes/flex/issues/428#issuecomment-539277966
@@ -23,6 +23,10 @@ configure_make(
     }),
     env = select({
         "@platforms//os:linux": {
+            "PATH": "$$(dirname $$EXT_BUILD_ROOT$$/$(location @m4//:m4_exe)):$$PATH",
+        },
+        "@platforms//os:macos": {
+            "AR": "",
             "PATH": "$$(dirname $$EXT_BUILD_ROOT$$/$(location @m4//:m4_exe)):$$PATH",
         },
         "//conditions:default": {},

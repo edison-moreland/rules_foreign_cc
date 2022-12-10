@@ -15,11 +15,13 @@ meson(
         "//conditions:default": [],
     }),
     out_lib_dir = select({
-        "@platforms//os:windows": "lib",
-        "//conditions:default": "lib/x86_64-linux-gnu",
+        "@platforms//os:linux": "lib/x86-64-linux-gnu",
+        "//conditions:default": "lib",
     }),
     out_shared_libs = select({
         "@platforms//os:windows": ["ffi-7.dll"],
-        "//conditions:default": ["libffi.so.7.1.0"],
+        "@platforms//os:linux": ["libffi.so.7.1.0"],
+        "@platforms//os:macos": ["libffi.dylib"],
+
     }),
 )
