@@ -98,7 +98,13 @@ meson_with_requirements(
             "@xorgproto",
             "@zlib",
         ],
-        "//conditions:default": [
+        "@platforms//os:macos": [
+            "@libxext",
+            "@libxfixes",
+            "@libx11",
+            "@zlib",
+        ],
+        "@platforms//os:windows": [
             "@zlib",
         ],
     }),

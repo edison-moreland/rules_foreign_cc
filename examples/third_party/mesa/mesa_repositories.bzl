@@ -169,3 +169,25 @@ def mesa_repositories():
         strip_prefix = "xtrans-1.4.0",
         url = "https://www.x.org/archive/individual/lib/xtrans-1.4.0.tar.gz",
     )
+
+    maybe(
+        http_archive,
+        name = "libpthread-stubs",
+        build_file = Label("//mesa:BUILD.libpthread-stubs.bazel"),
+        sha256 = "f8f7ca635fa54bcaef372fd5fd9028f394992a743d73453088fcadc1dbf3a704",
+        strip_prefix = "libpthread-stubs-0.1",
+        url = "https://www.x.org/archive//individual/lib/libpthread-stubs-0.1.tar.gz",
+    )
+
+    maybe(
+        http_archive,
+        name = "libxfixes",
+        build_file = Label("//mesa:BUILD.libxfixes.bazel"),
+        sha256 = "82045da5625350838390c9440598b90d69c882c324ca92f73af9f0e992cb57c7",
+        strip_prefix = "libXfixes-6.0.0",
+        url = "https://www.x.org/archive//individual/lib/libXfixes-6.0.0.tar.gz",
+    )
+
+    
+
+    

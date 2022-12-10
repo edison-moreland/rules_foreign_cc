@@ -11,17 +11,19 @@ filegroup(
 )
 
 configure_make(
-    name = "libxext",
+    name = "libxfixes",
     lib_source = ":all_srcs",
+    deps = [
+        "@libx11",
+        "@xorgproto",
+    ],
+    out_static_libs = [
+        "libXfixes.a"
+    ],
     env = select({
         "@platforms//os:macos": {
             "AR": "",
         },
         "//conditions:default": {},
     }),
-    out_headers_only = True,
-    deps = [
-        "@libx11",
-        "@xorgproto",
-    ],
 )

@@ -13,5 +13,11 @@ filegroup(
 configure_make(
     name = "gettext",
     lib_source = ":all_srcs",
-    postfix_script = "find $$INSTALLDIR$$",
+    env = select({
+        "@platforms//os:macos": {
+            "AR": "",
+        },
+        "//conditions:default": {},
+    }),
+    postfix_script = "find $$INSTALLDIR$$ && asdf",
 )

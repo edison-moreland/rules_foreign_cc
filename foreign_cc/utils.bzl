@@ -41,8 +41,8 @@ def runnable_binary(name, binary, foreign_cc_target, match_binary_name = False, 
     )
 
     wrapper_cmd = """
-    sed s@EXECUTABLE@$(rootpath {name})@g $(location @rules_foreign_cc//foreign_cc/private:runnable_binary_wrapper.sh) > $@
-    sed -i s@SH_BINARY_FILENAME@{sh_binary_filename}@g $@
+    sed s@EXECUTABLE@$(rootpath {name})@g $(location @rules_foreign_cc//foreign_cc/private:runnable_binary_wrapper.sh) > tmp
+    sed s@SH_BINARY_FILENAME@{sh_binary_filename}@g tmp > $@
     """
 
     native.genrule(
