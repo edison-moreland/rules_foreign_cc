@@ -24,6 +24,16 @@ def glib_repositories():
         http_archive,
         name = "gettext",
         build_file = Label("//glib:BUILD.gettext.bazel"),
+        strip_prefix = "gettext-0.21.1",
+        sha256 = "e8c3650e1d8cee875c4f355642382c1df83058bd5a11ee8555c0cf276d646d45",
+        url = "https://ftp.gnu.org/gnu/gettext/gettext-0.21.1.tar.gz",
+    )
+    maybe(
+        http_archive,
+        name = "gettext_win",
+        build_file = Label("//glib:BUILD.gettext_win.bazel"),
         sha256 = "0af0a6e2c26dd2c389b4cd5a473e121dad6ddf2f8dca38489c50858c7b8cdd9f",
         url = "https://download.gnome.org/binaries/win64/dependencies/gettext-runtime-dev_0.18.1.1-2_win64.zip",
     )
+
+    

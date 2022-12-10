@@ -15,7 +15,7 @@ meson(
         "//conditions:default": [],
     }),
     out_lib_dir = select({
-        "@platforms//os:linux": "lib/x86-64-linux-gnu",
+        "@platforms//os:linux": "lib/x86_64-linux-gnu",
         "//conditions:default": "lib",
     }),
     out_shared_libs = select({

@@ -1,17 +1,17 @@
-load("@bazel_skylib//rules:copy_file.bzl", "copy_file")
-load("@rules_cc//cc:defs.bzl", "cc_import")
+load("@rules_foreign_cc//foreign_cc:defs.bzl", "configure_make")
 
 package(default_visibility = ["//visibility:public"])
 
-copy_file(
-    name = "libint_dll",
-    src = "lib/libintl.dll.a",
-    out = "libintl.dll",
+filegroup(
+    name = "all_srcs",
+    srcs = glob(
+        include = ["**"],
+        exclude = ["*.bazel"],
+    ),
 )
 
-cc_import(
+configure_make(
     name = "gettext",
-    hdrs = glob(["include/**"]),
-    interface_library = "lib/intl.lib",
-    shared_library = ":libint_dll",
+    lib_source = ":all_srcs",
+    postfix_script = "find $$INSTALLDIR$$",
 )
