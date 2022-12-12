@@ -28,6 +28,11 @@ meson(
             "LIB": "$$EXT_BUILD_DEPS/lib",
             "PATH": "$$EXT_BUILD_DEPS/lib:$$(dirname $$EXT_BUILD_ROOT$$/$(PYTHON3)):$$PATH",
         },
+        "@platforms//os:macos": {
+            "C_INCLUDE_PATH": "$$EXT_BUILD_DEPS/include",
+            "LIBRARY_PATH": "$$EXT_BUILD_DEPS/lib",
+            "PATH": "$$(dirname $$EXT_BUILD_ROOT$$/$(PYTHON3)):$$PATH",
+        },        
         "//conditions:default": {
             "PATH": "$$(dirname $$EXT_BUILD_ROOT$$/$(PYTHON3)):$$PATH",
         },
