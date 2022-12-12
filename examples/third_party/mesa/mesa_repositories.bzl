@@ -21,6 +21,8 @@ def mesa_repositories():
             Label("//mesa:mesa.src_gallium_targets_dri_meson.build.patch"),
             Label("//mesa:mesa.src_egl_meson.build.patch"),
             Label("//mesa:mesa.src_glx_meson.build.patch"),
+            # This patch is required for mesa to build on MacOS
+            Label("//mesa:mesa.src_gallium_frontends_dri_dri_util.c.patch"),
         ],
         sha256 = "670d8cbe8b72902a45ea2da68a9da4dc4a5d99c5953a926177adbce1b1640b76",
         strip_prefix = "mesa-22.1.4",
