@@ -1,0 +1,5 @@
+Get CMAKE toolchain var working. Try:
+
+If target has more than one file, use detect root. Have test for it alongside the MAKE test and refer to the open ticket for it 
+
+get rid of mesa.patch

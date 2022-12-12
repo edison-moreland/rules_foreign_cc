@@ -68,6 +68,18 @@ diff -uNr mesa-22.1.4/src/gbm/meson.build mesa-22.1.4.new/src/gbm/meson.build
  
  libgbm = shared_library(
    'gbm',
+diff -uNr mesa-22.1.4/src/glx/meson.build mesa-22.1.4.new/src/glx/meson.build
+--- mesa-22.1.4/src/glx/meson.build	2022-07-15 18:42:47.000000000 +0100
++++ mesa-22.1.4.new/src/glx/meson.build	2022-12-12 09:36:07.300346991 +0000
+@@ -136,7 +136,7 @@
+   ],
+   dependencies : [
+     idep_mesautil, idep_xmlconfig,
+-    dep_libdrm, dep_dri2proto, dep_glproto, dep_x11, dep_glvnd,
++    dep_libdrm, dep_dri2proto, dep_glproto, dep_x11, dep_glvnd, dep_xext,
+   ],
+ )
+ 
 diff -uNr mesa-22.1.4/src/intel/vulkan/meson.build mesa-22.1.4.new/src/intel/vulkan/meson.build
 --- mesa-22.1.4/src/intel/vulkan/meson.build	2022-07-15 18:42:47.000000000 +0100
 +++ mesa-22.1.4.new/src/intel/vulkan/meson.build	2022-11-30 18:21:07.247725902 +0000
