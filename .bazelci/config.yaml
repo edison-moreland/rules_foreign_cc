@@ -100,6 +100,7 @@ tasks:
     build_targets: *macos_targets
     build_flags:
       - "--noincompatible_enable_cc_toolchain_resolution"
+      - "--experimental_ui_max_stdouterr_bytes=10485760"
     test_targets: *macos_targets
     test_flags:
       - "--noincompatible_enable_cc_toolchain_resolution"
