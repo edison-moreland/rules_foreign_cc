@@ -29,7 +29,7 @@ meson(
             "PATH": "$$EXT_BUILD_DEPS/lib:$$(dirname $$EXT_BUILD_ROOT$$/$(PYTHON3)):$$PATH",
         },
         "@platforms//os:macos": {
-            "C_INCLUDE_PATH": "$$EXT_BUILD_DEPS/gettext/include",
+            "CPATH": "$$EXT_BUILD_DEPS/gettext/include",
             "LIBRARY_PATH": "$$EXT_BUILD_DEPS/gettext/lib",
             "PATH": "$$(dirname $$EXT_BUILD_ROOT$$/$(PYTHON3)):$$PATH",
         },        
@@ -52,8 +52,8 @@ meson(
         "//conditions:default": [],
     }),
     out_lib_dir = select({
-        "@platforms//os:windows": "lib",
-        "//conditions:default": "lib/x86_64-linux-gnu",
+        "@platforms//os:linux": "lib/x86_64-linux-gnu",
+        "//conditions:default": "lib",
     }),
     out_shared_libs = select({
         "@platforms//os:windows": [
@@ -63,12 +63,19 @@ meson(
             "gobject-2.0-0.dll",
             "gthread-2.0-0.dll",
         ],
-        "//conditions:default": [
+        "@platforms//os:linux": [
             "libgio-2.0.so.0",
             "libglib-2.0.so.0",
             "libgmodule-2.0.so.0",
             "libgobject-2.0.so.0",
             "libgthread-2.0.so.0",
+        ],
+        "@platforms//os:macos": [
+            "libglib-2.0.dylib",
+            "libgobject-2.0.dylib",
+            "libgthread-2.0.dylib",
+            "libgmodule-2.0.dylib",
+            "libgio-2.0.dylib",
         ],
     }),
     toolchains = ["@rules_python//python:current_py_toolchain"],
@@ -77,5 +84,4 @@ meson(
         "@platforms//os:windows": DEPS + ["@gettext_win//:gettext"],
         "//conditions:default": DEPS,
     }),
-    tool_prefix = "ls $$EXT_BUILD_DEPS/gettext/lib && "
 )
