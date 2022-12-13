@@ -29,8 +29,8 @@ meson(
             "PATH": "$$EXT_BUILD_DEPS/lib:$$(dirname $$EXT_BUILD_ROOT$$/$(PYTHON3)):$$PATH",
         },
         "@platforms//os:macos": {
-            "C_INCLUDE_PATH": "$$EXT_BUILD_DEPS/include",
-            "LIBRARY_PATH": "$$EXT_BUILD_DEPS/lib",
+            "C_INCLUDE_PATH": "$$EXT_BUILD_DEPS/gettext/include",
+            "LIBRARY_PATH": "$$EXT_BUILD_DEPS/gettext/lib",
             "PATH": "$$(dirname $$EXT_BUILD_ROOT$$/$(PYTHON3)):$$PATH",
         },        
         "//conditions:default": {
@@ -77,4 +77,5 @@ meson(
         "@platforms//os:windows": DEPS + ["@gettext_win//:gettext"],
         "//conditions:default": DEPS,
     }),
+    tool_prefix = "ls $$EXT_BUILD_DEPS/gettext/lib && "
 )
