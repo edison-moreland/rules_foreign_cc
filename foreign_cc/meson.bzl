@@ -84,11 +84,11 @@ def _create_meson_script(configureParameters):
 
     prefix = "{} ".format(expand_locations_and_make_variables(ctx, attrs.tool_prefix, "tool_prefix", data)) if attrs.tool_prefix else ""
 
-    script.append("{prefix}{meson} --prefix={install_dir} {setup_args_str} {options} {source_dir}".format(
+    script.append("{prefix}{meson} --prefix={install_dir} {setup_args} {options} {source_dir}".format(
         prefix = prefix,
         meson = attrs.meson_path,
         install_dir = "$$INSTALLDIR$$",
-        setup = setup_args_str,
+        setup_args = setup_args_str,
         options = options_str,
         source_dir = "$$EXT_BUILD_ROOT$$/" + root,
     ))
